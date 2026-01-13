@@ -1,10 +1,11 @@
-# kline_test
+# 人生 K ��� · 理性趋势分析工具
 
-WeChat Mini Program demo for kline chart rendering and related utilities.
+这是一个微信小程序 + 可企业化 SDK 的趋势分析系统，
+用于可视化人生阶段趋势与风险结构。
 
-Structure:
-- pages/kline: page demonstrating K-line chart
-- components/kline-chart: reusable K-line chart component
-- utils/destiny: generator and explanation utilities
-- utils/access: access/permission helpers
-- docs: product & technical documentation
+## 功能
+- 人生 K 线图
+- 阶段趋势解读
+- Explain Engine 可解释文本
+- 普通 / 全屏模式
+- 付费分层（Free / Plus / Pro）
