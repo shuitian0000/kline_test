@@ -1,6 +1,6 @@
 // utils/destiny/explain-template.js
-// Templates for explaining kline patterns or signals
-function templateSignal(signalName, details) {
-  return `${signalName}: ${details}`;
+export const TEMPLATES = {
+  trend: { up:'该阶段整体呈现上行趋势，变化空间相对较大。', down:'该阶段整体处于调整趋势，节奏可能相对放缓。', flat:'该阶段整体较为平稳，变化幅度有限。' },
+  risk: level=>level>0.7?'不确定性较高，外部与内部变量同时存在。':level>0.4?'存在一定波动，需要关注变化节奏。':'整体不确定性较低，环境相对可控。',
+  strategy: bias=>({'偏稳':'更适合保持稳态与抗风险能力。','平衡':'可在稳定与探索之间保持弹性。','偏进':'环境允许一定程度的主动尝试。'}[bias]||'')
 }
-module.exports = { templateSignal };
