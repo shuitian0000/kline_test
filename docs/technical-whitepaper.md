@@ -1,7 +1,76 @@
 # Technical Whitepaper
 
-High-level architecture and design considerations.
+人生 K 线系统 · 技术白皮书
+1. 系统目标
 
-- Component-based UI (WeChat Mini Program components)
-- Utilities for data generation, pattern explanation, and access control
-- Extensible rendering: Canvas or third-party chart libs
+构建一个 可解释、可约束、可审计 的长期趋势分析系统，
+避免黑箱预测与结果导向输出。
+
+2. 系统架构概览
+输入信息
+  ↓
+结构映射（八字 / 时间）
+  ↓
+阶段化建模（年龄区间）
+  ↓
+社会周期修正
+  ↓
+K 线参数生成
+  ↓
+Explain Engine（解释而非结论）
+
+3. K 线的技术含义
+
+Open / Close：阶段起止的综合趋势状态
+
+High / Low：阶段内的波动区间
+
+非价格含义：不代表收益、不代表成功或失败
+
+4. Explain Engine 原则
+
+Explain Engine 仅执行以下功能：
+
+描述趋势形态
+
+说明风险结构
+
+提供策略姿态视角
+
+明确不做：
+
+结果预测
+
+行为指导
+
+情绪强化
+
+5. 社会周期修正模型
+
+社会周期作为 外生变量 引入，仅用于：
+
+调整波动幅度
+
+修正不确定性权重
+
+不用于：
+
+个体命运判断
+
+事件预测
+
+6. 合规与安全设计
+
+全文本经过语气降温模块
+
+输出内容不含“必须 / 一定 / 保证”等词汇
+
+付费仅解锁信息密度，不改变模型结果
+
+7. 技术结论
+
+本系统属于：
+
+结构分析与趋势可视化工具
+
+不属于预测系统、算命系统或决策系统。
