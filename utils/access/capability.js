@@ -1,7 +1,7 @@
 // utils/access/capability.js
-// Capability checks
-function canUseFeature(user, feature) {
-  // placeholder logic
-  return Boolean(user && user.capabilities && user.capabilities.includes(feature));
+export const CAPABILITY={
+  free:{explainText:false,riskDetail:false,societyContext:false},
+  plus:{explainText:true,riskDetail:true,societyContext:false},
+  pro:{explainText:true,riskDetail:true,societyContext:true}
 }
-module.exports = { canUseFeature };
+
