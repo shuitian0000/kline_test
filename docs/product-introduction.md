@@ -1,6 +1,61 @@
 # Product Introduction
 
-This document introduces the kline_test product, its goals and target users.
+人生 K 线 · 理性趋势分析工具
+产品定位
 
-- Purpose: Provide an embeddable K-line chart demo for WeChat Mini Program.
-- Target: Developers wanting a lightweight kline component and explanation tools.
+本产品是一款 基于多因素结构分析的长期趋势可视化工具，
+用于帮助用户从 时间维度 理解个人发展过程中的节奏变化与风险结构。
+
+产品不提供结果预测，不给出行为指令，仅提供趋势、波动与结构视角。
+
+核心功能
+1. 人生 K 线图
+
+以年龄阶段为横轴
+
+以综合趋势强弱为纵轴
+
+使用 K 线形式表达阶段内的变化区间
+
+2. 阶段趋势解读
+
+每个阶段包含：
+
+趋势方向（上行 / 调整 / 平稳）
+
+风险等级（低 / 中 / 高）
+
+策略姿态（偏稳 / 平衡 / 偏进）
+
+3. 可解释分析
+
+部分版本可查看：
+
+阶段变化的结构性原因
+
+不确定性来源说明
+
+节奏与承受能力的匹配提示
+
+使用建议
+
+本工具适合用于：
+
+长期规划时的节奏参考
+
+阶段性回顾与结构分析
+
+理性理解变化与风险
+
+不适合用于：
+
+替代现实决策
+
+预测具体结果
+
+医疗、法律、投资等专业判断
+
+免责声明
+
+本产品提供的所有信息仅为 趋势分析与结构视角参考，
+不构成任何形式的预测、建议或承诺。
