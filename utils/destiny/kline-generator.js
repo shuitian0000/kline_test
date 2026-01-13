@@ -1,17 +1,27 @@
 // utils/destiny/kline-generator.js
-// Generate synthetic kline data for demos / testing
-function generateCandles(count = 100) {
-  const candles = [];
-  let price = 100;
-  for (let i = 0; i < count; i++) {
-    const open = price;
-    const close = +(open + (Math.random() - 0.5) * 2).toFixed(2);
-    const high = Math.max(open, close) + +(Math.random() * 1).toFixed(2);
-    const low = Math.min(open, close) - +(Math.random() * 1).toFixed(2);
-    const volume = Math.floor(Math.random() * 1000);
-    candles.push([open, close, high, low, volume]);
-    price = close;
-  }
-  return candles;
+import { splitLifeStages } from './decade'
+
+export function generateLifeKLine(profile) {
+  const stages = splitLifeStages()
+  let lastClose = 0.5
+
+  return stages.map(stage => {
+    const baseTrend = baseTrendByAge(stage.ageMid)
+    const personalBias = personalFactor(profile)
+    const open = lastClose
+    let close = clamp(open + baseTrend + personalBias)
+    const volatility = baseVolatility(stage.ageMid)
+    const high = clamp(Math.max(open, close) + volatility)
+    const low = clamp(Math.min(open, close) - volatility)
+    const riskLevel = clamp(volatility*0.6 + Math.abs(close-open)*0.8)
+    const strategyBias = riskLevel>0.7?'偏稳':riskLevel<0.3?'偏进':'平衡'
+    lastClose = close
+    return { ...stage, open, close, high, low, trend: close>open?'up':close<open?'down':'flat', riskLevel, strategyBias, explainSeed: { age: stage.ageMid, volatility, delta: close-open } }
+  })
 }
-module.exports = { generateCandles };
+
+function baseTrendByAge(age) { if(age<25) return 0.05; if(age<35) return 0.08; if(age<45) return 0.03; if(age<55) return -0.02; if(age<65) return -0.04; return -0.02 }
+function baseVolatility(age) { if(age<30) return 0.18; if(age<45) return 0.14; if(age<60) return 0.10; return 0.08 }
+function personalFactor(profile) { const balance=profile?.wuxingBalance||0; return clamp(balance*0.05,-0.05,0.05) }
+function clamp(v,min=0,max=1){return Math.max(min,Math.min(max,v))}
+
