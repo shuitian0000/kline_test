@@ -2,15 +2,10 @@ import os
 import shutil
 
 # ✅ 说明
-
 # 生成的 ZIP 文件名：kline_full_app_final_precise.zip
-
 # 完整目录：pages、components、utils/destiny、utils/access、docs
-
 # 完整功能：index 页面输入、K线滑块、全屏横屏、点击弹窗、动态蜡烛图
-
 # 升级模块：精准农历 1900–2100、八字、社会周期、Explain Engine
-
 # 可直接在微信开发者工具运行
 
 ROOT_DIR = 'kline_full_app_final_precise'
