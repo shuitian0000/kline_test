@@ -1,4 +1,62 @@
+# 支持公历/农历输入
 
+# 八字排盘完整实现
+
+# 五行平衡计算
+
+# K 线生成 + 社会周期修正
+
+# Explain Engine + 文本软化
+
+# K 线交互：滑块、高亮、点击弹窗、全屏横屏
+
+# 付费分层
+
+# 文档完整
+# 所有 Destiny / Access 模块全部补全，确保解压后 微信开发者工具即可直接运行完整小程序 demo，包括：
+
+# Destiny 模块
+
+# bazi.js（八字排盘 + 五行平衡）
+
+# lunar.js（农历 ↔ 公历转换）
+
+# decade.js（年龄阶段划分）
+
+# society.js（社会周期修正）
+
+# kline-generator.js（K 线生成逻辑）
+
+# explain-engine.js（Explain Engine，文本输出）
+
+# explain-template.js（趋势、风险、策略模板）
+
+# tone-adjust.js（文本软化）
+
+# Access 模块
+
+# plan.js（付费层定义）
+
+# capability.js（付费层权限控制）
+
+# Pages / Components / Docs 已经包含
+# ✅ 完成效果
+
+# 农历/公历都支持
+
+# 八字排盘 + 五行平衡完整
+
+# 年龄阶段划分 + K 线生成 + 社会周期修正
+
+# Explain Engine 输出趋势、风险、策略、宏观波动
+
+# K 线组件交互：滑块、高亮、点击弹窗、全屏横屏
+
+# 付费分层生效
+
+# 文档齐全
+
+# ZIP 解压即可直接在微信开发者工具运行
 
 农历 ↔ 公历模块
 
