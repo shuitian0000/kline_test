@@ -1,10 +1,43 @@
 # Product Boundary
 
-Define what the product includes and what is out-of-scope.
+功能与边界说明
+本产品提供的能力
 
-Includes:
-- K-line chart component and demo page
-- Utility modules for data generation and explanation
-Out-of-scope:
-- Production-level chart performance tuning
-- Server-side APIs (this is a client-side demo)
+长期趋势的结构性展示
+
+阶段波动与风险的描述
+
+多视角解释信息
+
+本产品不提供的能力
+
+不预测个人未来事件
+
+不给出行为建议
+
+不替代现实决策
+
+不涉及医疗、法律、投资等领域
+
+关于付费内容
+
+付费内容仅增加：
+
+信息完整度
+
+解释维度
+
+对比视角
+
+不会：
+
+改变任何趋势结果
+
+提供“更准确”的判断
+
+引导用户依赖
+
+用户责任说明
+
+用户应基于自身实际情况进行判断，
+本产品仅作为辅助理解工具使用。
