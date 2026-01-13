@@ -1,4 +1,5 @@
-<view class="kline-chart">
-  <!-- Canvas or chart container -->
-  <canvas canvas-id="klineCanvas" class="kline-canvas"></canvas>
-</view>
+<canvas
+  canvas-id="lifeKline"
+  class="kline-canvas"
+  bindtap="onCanvasTap"
+/>
