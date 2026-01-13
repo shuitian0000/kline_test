@@ -1,12 +1,14 @@
 {
   "pages": [
-    "pages/kline/kline"
+    "pages/index/index"
   ],
   "window": {
-    "backgroundTextStyle": "light",
+    "navigationBarTitleText": "人生K线",
     "navigationBarBackgroundColor": "#ffffff",
-    "navigationBarTitleText": "Kline Demo",
     "navigationBarTextStyle": "black"
   },
-  "usingComponents": {}
+  "usingComponents": {
+    "ec-canvas": "/components/ec-canvas/ec-canvas"
+  }
 }
+
