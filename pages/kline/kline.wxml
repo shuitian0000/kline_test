@@ -1,4 +1,4 @@
-<view class="page kline-page">
-  <kline-chart />
-  <view class="info">K-line demo page</view>
-</view>
+<kline-chart
+  kline-data="{{kline}}"
+  bind:select="onSelect"
+/>
