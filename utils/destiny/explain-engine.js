@@ -10,6 +10,7 @@ export function explainPoint(point, plan='free'){
   sections.push(TEMPLATES.strategy(point.strategyBias))
   if(cap.explainText) sections.push(generateAttention(point))
   if(cap.societyContext && point.macroContext) sections.push(`该阶段处于宏观不确定性偏${point.macroContext.volatility}的环境中。`)
+  //这里 cap.societyContext 是付费 Pro 才显示的宏观信息。
   return soften(sections.filter(Boolean).join('\n'))
 }
 
