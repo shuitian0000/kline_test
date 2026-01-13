@@ -1,0 +1,291 @@
+人生 K 线小程序详细设计文档
+从高层架构到具体实现都覆盖，同时体现社会周期修正、K 线生成、Explain Engine、付费层逻辑、全屏交互和合规设计。
+1. 项目概述
+
+项目名称：人生 K 线 · 理性趋势分析工具
+
+目标：
+提供一个微信小程序及企业级 SDK，用于将用户时间信息（出生日期、八字、性别、出生地点等）映射为 可视化的长期趋势与风险结构，帮助用户理解人生阶段节奏和潜在风险。
+
+强调：非预测、非迷信、不涉及具体事件判断，符合平台合规要求。
+
+核心特点：
+
+人生阶段划分与 K 线可视化
+
+社会周期修正模型（宏观趋势影响）
+
+Explain Engine 输出可读文本
+
+付费分层显示不同层级信息
+
+全屏/非全屏交互，年龄滑块选择
+
+企业级 SDK 可嵌入 B 端产品
+
+2. 高层系统架构
+┌───────────────────────────┐
+│        小程序 / App       │  ← Client SDK
+│  - 页面渲染 K 线          │
+│  - 用户交互（点击/滑块） │
+└────────────┬──────────────┘
+             │
+┌────────────▼──────────────┐
+│     Core Analysis Engine  │  ← 本地或云端可部署
+│  - Timeline Mapping       │
+│  - K Line Generator       │
+│  - Society Cycle Adjust   │
+│  - Explain Engine         │
+└────────────┬──────────────┘
+             │
+┌────────────▼──────────────┐
+│ Compliance & Boundary Layer│
+│  - 文本软化（tone-adjust） │
+│  - 输出审计 & 能力矩阵    │
+│  - 社会周期仅按付费层展示 │
+└───────────────────────────┘
+
+
+说明：
+
+Client SDK：小程序渲染、交互、全屏切换、点击事件
+
+Core Analysis Engine：生成每个年龄段 K 线数据，包括趋势、风险、策略、宏观修正
+
+Compliance Layer：确保文本、数据符合平台要求，防止算命、预测误导
+
+3. 功能模块设计
+3.1 用户输入模块
+
+输入数据：
+
+姓名、性别
+
+出生日期（农历/公历）、时辰
+
+出生地（地级市）
+
+可选：五行平衡、用户偏好等
+
+处理：
+
+根据八字生成结构化年龄阶段信息
+
+调用 splitLifeStages() 生成阶段数组
+
+3.2 人生阶段划分模块
+
+文件：utils/destiny/decade.js
+功能：
+
+将 16~80 岁划分为每 10 岁一个阶段
+
+每阶段包含 ageStart, ageEnd, ageMid
+
+输出阶段数组用于 K 线生成
+
+3.3 K 线生成模块
+
+文件：utils/destiny/kline-generator.js
+功能：
+
+每阶段生成 open/close/high/low 值
+
+生成趋势方向 (up/down/flat)
+
+计算风险等级、策略倾向
+
+引入社会周期修正 (macroContext)
+
+核心逻辑：
+
+基于年龄段确定基础趋势和波动：
+
+baseTrendByAge(age)
+baseVolatility(age)
+
+
+加入个人偏好修正：
+
+personalFactor(profile)
+
+
+社会周期修正：
+
+const macro = getSocietyContext(stage)
+adjustedVol = volatility + macro.volatility * 0.5
+
+
+生成阶段 K 线数据：
+
+open/close/high/low
+
+trend
+
+riskLevel
+
+strategyBias
+
+macroContext
+
+explainSeed
+
+3.4 社会周期修正模块
+
+文件：utils/destiny/society.js
+功能：
+
+根据年龄阶段返回宏观环境波动 volatility
+
+可用简化模型：历史周期 + 年龄权重
+
+输出结果用于 K 线调整和 Explain Engine 展示
+
+3.5 Explain Engine
+
+文件：
+
+utils/destiny/explain-engine.js
+
+utils/destiny/explain-template.js
+
+utils/destiny/tone-adjust.js
+
+功能：
+
+根据阶段 K 线、风险等级、策略倾向和宏观环境生成文本
+
+支持付费层差异化输出：
+
+Free：仅趋势和策略
+
+Plus：风险说明
+
+Pro：宏观周期说明
+
+输出文本经过 tone-adjust 软化，避免确定性或误导性语句
+
+示例输出：
+
+该阶段整体呈现上行趋势，变化空间相对较大。
+存在一定波动，需要关注变化节奏。
+可在稳定与探索之间保持弹性。
+该阶段处于宏观不确定性偏0.13的环境中。
+
+3.6 客户端渲染模块
+
+文件：components/kline-chart/
+功能：
+
+Canvas 绘制 K 线
+
+点击触发 onSelect 显示 Explain Engine 文本
+
+支持全屏横屏显示
+
+支持顶部年份滑块选择阶段
+
+3.7 付费能力控制模块
+
+文件：utils/access/plan.js、utils/access/capability.js
+功能：
+
+Free / Plus / Pro 分层显示内容
+
+决定 Explain Engine 输出内容及宏观周期展示
+
+3.8 合规与审计模块
+
+文本软化：替换“必然/一定”等敏感词
+
+输出审计：保证无预测/决策/迷信属性
+
+界面文案：首次进入弹窗 + 底部说明
+
+目的：通过 Y-3 层防投诉
+
+4. 页面与交互设计
+页面结构
+pages/kline/kline.wxml
+  - 顶部 slider: 年龄选择
+  - K 线 canvas
+  - 全屏按钮
+
+交互流程
+
+页面加载 → 调用 Core Engine 生成 K 线数据
+
+用户滑动年份滑块 → 高亮对应阶段
+
+用户点击 K 线 → 弹出 Explain Engine 文本
+
+用户点击全屏 → Canvas 横屏显示
+
+5. 数据流程
+用户输入 → splitLifeStages() → generateLifeKLine()
+     → getSocietyContext() → K 线数据 + macroContext
+     → Explain Engine → 文本输出 → 客户端渲染
+
+
+数据既可在本地小程序生成，也可封装为 SDK / API 提供给企业端
+
+6. 企业级 SDK / API 设计
+
+核心接口：POST /v1/trend/analyze
+
+输入：
+
+{ profile: {...}, range:{startAge:0,endAge:80,step:5}, plan:"plus" }
+
+
+输出：
+
+{ timeline: [{ageRange:[30,35],kline:{open:..,close:..},trend:"up",riskLevel:..,strategyBias:"平衡",macroContext:{volatility:0.12},explainSeed:{...}}] }
+
+
+Compliance Layer 强制边界
+
+Output Guard + Text Softening
+
+7. 目录结构
+kline_test/
+├── README.md
+├── app.js
+├── app.json
+├── app.wxss
+├── pages/kline/
+│   ├── kline.wxml
+│   ├── kline.wxss
+│   └── kline.js
+├── components/kline-chart/
+│   ├── kline-chart.wxml
+│   ├── kline-chart.wxss
+│   └── kline-chart.js
+├── utils/destiny/
+│   ├── decade.js
+│   ├── kline-generator.js
+│   ├── society.js
+│   ├── explain-template.js
+│   ├── tone-adjust.js
+│   └── explain-engine.js
+├── utils/access/
+│   ├── plan.js
+│   └── capability.js
+├── docs/
+│   ├── product-introduction.md
+│   ├── technical-whitepaper.md
+│   └── product-boundary.md
+
+8. 总结
+
+已实现 从八字解析 → 阶段划分 → K 线生成 → 社会周期修正 → Explain Engine → 客户端渲染 → 付费分层 → 合规防护
+
+支持 企业级 SDK / API
+
+可用于 B 端接入，符合平台审核要求
+
+页面交互完整：滑块、点击、全屏横屏
+
+文本输出软化，防止误导/迷信
+
+该设计文档可作为开发、上线、合规审核及企业对接的完整参考。
