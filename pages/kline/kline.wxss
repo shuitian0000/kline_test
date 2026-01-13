@@ -1,0 +1,8 @@
+.kline-page {
+  padding: 12px;
+}
+.info {
+  margin-top: 8px;
+  color: #666;
+  font-size: 14px;
+}

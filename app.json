@@ -1,0 +1,12 @@
+{
+  "pages": [
+    "pages/kline/kline"
+  ],
+  "window": {
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "Kline Demo",
+    "navigationBarTextStyle": "black"
+  },
+  "usingComponents": {}
+}
