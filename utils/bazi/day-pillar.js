@@ -1,3 +1,4 @@
+//日柱（六十日循环，确定算法）
 // day-pillar.js
 import { ganzhiFromIndex } from './ganzhi';
 
