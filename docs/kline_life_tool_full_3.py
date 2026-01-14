@@ -10,6 +10,18 @@ import json
 
 # 示例条形图占位显示 bz/soc/phase 三因子
 
+# K线滑块联动年度数据
+
+# 点击 K线点弹窗显示对应年度趋势 + 关键焦点 + BZ/SOC/Phase
+
+# 年度对比报告页面与 K线滑块同步显示
+
+# 参数可视化示例页面
+
+# 完整 utils 模块 + docs + data
+
+# 可直接运行在微信开发者工具，交互示例可用
+
 project_name = "kline_life_tool"
 zip_file_name = "kline_life_tool_demo_full_dynamic.zip"
 
