@@ -1,6 +1,22 @@
 import os
 import zipfile
 
+# 🔹 升级后特点
+
+# 滑块 + 点击弹窗演示：K线页面可以滑动年份和点击点触发弹窗
+
+# 全屏横屏占位：K线页面逻辑可扩展全屏
+
+# 年度报告占位数据 + 条形图空间
+
+# 参数可视化前端页面占位：决策风格/时间视角/建议密度
+
+# 完整 utils 逻辑占位：八字/农历/社会周期/K线辅助/半学习型模型
+
+# docs 完整文档 + data 示例数据
+
+# 可直接解压运行微信开发者工具，可替换占位代码为真实算法逻辑
+
 project_name = "kline_life_tool"
 zip_file_name = "kline_life_tool_demo_full.zip"
 
