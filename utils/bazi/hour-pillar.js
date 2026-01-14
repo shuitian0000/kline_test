@@ -1,3 +1,4 @@
+//时柱（按真太阳时）
 // hour-pillar.js
 import { TIAN_GAN, DI_ZHI } from './ganzhi';
 
