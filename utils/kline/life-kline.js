@@ -1,3 +1,15 @@
+// import { getSocietyContext } from '../society/society-context';
+
+// const society = getSocietyContext({ year, age });
+
+// let score = calcYearScore(...);
+
+// // 只影响“波动”，不改趋势方向
+// score *= 1 + (society.volatility - 0.5) * 0.3;
+
+
+
+
 // 人生 K 线总引擎（最重要）
 import { getDaYunPillars } from '../destiny/dayun';
 import { scoreDaYun } from '../destiny/dayun-score';
