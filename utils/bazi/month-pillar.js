@@ -1,3 +1,4 @@
+//月柱（重点：不是农历月）
 // month-pillar.js
 import { TIAN_GAN, DI_ZHI } from './ganzhi';
 
