@@ -1,3 +1,26 @@
+
+
+用确定结构 + 可控模板 + 算法结果 → 生成“像投研报告一样”的年度策略文本
+这点极其重要，直接决定：
+文案质量稳定
+不会越界
+易审核
+易商业化
+
+二、年度策略报告在系统中的位置
+utils/
+├── report/
+│   ├── report-engine.js        ✅ 总控
+│   ├── report-structure.js     ✅ 报告结构定义
+│   ├── report-sections/
+│   │   ├── overview.js         ✅ 年度环境概览
+│   │   ├── personal.js         ✅ 个人结构分析
+│   │   ├── strategy.js         ✅ 行动策略
+│   │   ├── risk.js             ✅ 风险与边界
+│   │   └── summary.js          ✅ 一页总结
+│   └── report-adapter.js       ✅ 页面调用
+
+
 七、为什么这个“年度策略报告”非常强
 | 维度   | 说明      |
 | ---- | ------- |
