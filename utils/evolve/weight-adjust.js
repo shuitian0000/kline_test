@@ -1,3 +1,7 @@
+
+// 权重微调公式（安全、不会跑飞）
+
+
 export function adjustWeight(w, feedback) {
   const rate = 0.03        // 学习率（很小）
   const next = w * (1 + rate * feedback)
