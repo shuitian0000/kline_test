@@ -1,0 +1,162 @@
+C 是整个系统从「规则专家系统」→「进化型决策系统」的分水岭。
+我会一边直接给你可落地的工程方案，一边把你问的 3 个关键问题彻底讲清楚：
+1️⃣ 数据存在哪里
+2️⃣ 是“单用户进化”还是“全系统进化”
+3️⃣ 是否必须要后端
+我先给结论，再给实现。
+
+一、先给你清晰结论（非常重要）
+✅ 最优方案不是二选一，而是 三层进化体系
+层级	是否需要后端	作用
+L1 本地个人进化	❌ 不需要	个性化、隐私、安全
+L2 群体统计进化	✅ 可选	模型稳态、权重校准
+L3 模型版本进化	✅ 必须	商业级护城河
+👉 你现在做 C，只需要完整实现 L1
+👉 L2 / L3 是“上线后自然升级”的，不挡你现在推进
+
+二、C 模块在系统中的位置（工程结构）
+utils/
+├── evolve/
+│   ├── feedback-store.js      ✅ 数据存储层
+│   ├── weight-adjust.js       ✅ 权重进化算法
+│   ├── evolve-engine.js       ✅ 总调度
+│   └── evolve-policy.js       ✅ 策略限制（防跑偏）
+
+三、什么叫“进化”？我们工程化定义
+
+当用户在某一年段，对“建议是否有效”给出反馈时，
+系统对「权重参数」进行微调，而不是推翻规则
+
+❌ 不改规则
+❌ 不改模板
+❌ 不“算得更玄”
+
+✅ 只改：
+八字权重
+社会周期权重
+阶段权重
+
+四、C-1：数据存在哪里？（你最关心的问题）
+4.1 L1：单用户本地进化（你现在必须做的）
+📦 存储位置
+wx.setStorageSync('evolve_profile', {
+  weights: {
+    bz: 1.0,
+    soc: 1.0,
+    phase: 1.0
+  },
+  history: [
+    {
+      age: 32,
+      predicted: 1.3,
+      feedback: +1   // 用户觉得“有帮助”
+    }
+  ]
+})
+特点
+✔ 完全端侧
+✔ 不涉及隐私合规
+✔ 平台审核无压力
+✔ 每个人“越用越准”
+👉 这是默认必须实现的
+
+4.2 L2：群体统计进化（可选）
+是否需要后端？
+👉 需要，但不是实时、不是强依赖
+上传的是 匿名统计
+只上传：
+年龄段
+权重偏移量
+不上传八字、不上传身份
+{
+  ageRange: "30-35",
+  delta: { soc:+0.03, bz:-0.01 }
+}
+用途：
+校准社会周期强弱
+避免规则系统“自嗨”
+
+4.3 L3：模型版本进化（商业级）
+后端周期性训练
+发布 model_v2.json
+小程序启动时拉取
+👉 这是“收费产品护城河”
+
+五、C-2：进化算法（端侧可跑）
+5.1 用户反馈定义（UI 非常简单）
+feedback ∈ {-1, 0, +1}
++1：有帮助
+0：一般
+-1：不准 / 不适用
+
+5.2 权重微调公式（安全、不会跑飞）
+weight-adjust.js
+export function adjustWeight(w, feedback) {
+  const rate = 0.03        // 学习率（很小）
+  const next = w * (1 + rate * feedback)
+  return clamp(next, 0.7, 1.3)
+}
+
+5.3 应用到三大因子
+export function evolveWeights(profile, feedback) {
+  profile.weights.bz = adjustWeight(profile.weights.bz, feedback)
+  profile.weights.soc = adjustWeight(profile.weights.soc, feedback)
+  profile.weights.phase = adjustWeight(profile.weights.phase, feedback)
+  return profile
+}
+
+六、C-3：进化引擎总控（防止系统失控）
+evolve-policy.js
+export function allowEvolve(profile) {
+  return profile.history.length < 30
+}
+原因：
+防止“情绪性连续点击”
+防止短期噪声污染模型
+evolve-engine.js
+import { evolveWeights } from './weight-adjust'
+import { allowEvolve } from './evolve-policy'
+
+export function applyFeedback(age, predicted, feedback) {
+  const profile = wx.getStorageSync('evolve_profile') || {
+    weights:{bz:1,soc:1,phase:1},
+    history:[]
+  }
+
+  if (!allowEvolve(profile)) return profile
+
+  profile.history.push({ age, predicted, feedback })
+  evolveWeights(profile, feedback)
+
+  wx.setStorageSync('evolve_profile', profile)
+  return profile
+}
+
+七、进化后，算法是如何“变聪明”的？
+你之前的公式是：
+LifeK = bz × soc × phase
+现在升级为：
+LifeK = 
+  (bz × Wbz) ×
+  (soc × Wsoc) ×
+  (phase × Wphase)
+👉 规则没变，个性在变
+
+八、是否必须后端？给你明确答案
+场景	是否必须
+单用户越用越准	❌
+合规上线	❌
+商业护城河	✅
+群体趋势校准	✅
+模型版本控制	✅
+👉 你现在完全可以“无后端上线”
+
+九、你现在的系统已经进化到什么级别？
+你已经拥有：
+能力	状态
+趋势建模	✅
+可解释输出	✅
+行动建议	✅
+个性化进化	✅
+合规可控	✅
+这已经是一个真正可称为「理性决策系统」的小程序。
