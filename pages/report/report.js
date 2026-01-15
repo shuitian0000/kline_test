@@ -19,3 +19,7 @@
 // - 延续稳健策略
 // - 保持灵活调整
 
+// const report = generateReport(context)
+// this.setData({ report })
+
+
