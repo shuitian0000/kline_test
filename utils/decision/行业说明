@@ -1,0 +1,222 @@
+
+B 是整个系统从「趋势分析」升级为「可行动决策工具」的关键。
+我会继续保持同样原则：
+
+❌ 不玄学
+❌ 不模糊
+✅ 可解释
+✅ 可端侧运行
+✅ 可直接接你现在的小程序
+
+下面 直接把 B：八字喜忌 → 行业 / 行动建议映射 做到工程级可落地。
+
+一、B 模块在整体系统中的位置
+utils/
+├── decision/
+│   ├── xi-ji-engine.js        ✅ 八字喜忌计算
+│   ├── industry-map.js        ✅ 五行 → 行业
+│   ├── action-map.js          ✅ 五行 → 行动策略
+│   ├── decision-engine.js     ✅ 总决策输出（今天做）
+
+
+Explain（A）解决的是 “现在处在什么状态”
+Decision（B）解决的是 “此状态下应该做什么”
+
+二、什么是「喜忌」——工程化定义（非常重要）
+
+我们不用“喜神忌神”玄学说法，而用：
+
+当前结构中，哪些五行“补足短板”，哪些“放大风险”
+
+输入：八字五行分布
+{
+  木: 1.2,
+  火: 0.9,
+  土: 0.8,
+  金: 1.1,
+  水: 0.6
+}
+
+判定规则（工程化）
+function calcXiJi(wuxingMap) {
+  const entries = Object.entries(wuxingMap)
+  entries.sort((a,b)=>b[1]-a[1])
+
+  return {
+    xi: entries.slice(-2).map(e=>e[0]),   // 最弱 → 喜
+    ji: entries.slice(0,1).map(e=>e[0])   // 最强 → 忌
+  }
+}
+
+
+👉 本质是：
+
+补短板 = 喜
+
+防过载 = 忌
+
+三、五行 → 行业映射（可审核版）
+industry-map.js
+export const INDUSTRY_MAP = {
+  木: [
+    "教育培训",
+    "文化出版",
+    "设计创意",
+    "咨询策划"
+  ],
+  火: [
+    "互联网",
+    "人工智能",
+    "新媒体",
+    "能源科技"
+  ],
+  土: [
+    "房地产",
+    "农业",
+    "供应链",
+    "基础设施"
+  ],
+  金: [
+    "金融",
+    "制造业",
+    "法律",
+    "管理咨询"
+  ],
+  水: [
+    "贸易",
+    "物流",
+    "旅游",
+    "信息流通"
+  ]
+}
+
+
+⚠️ 注意：
+
+没有迷信行业
+
+全是现实经济分类
+
+审核安全
+
+四、五行 → 行动策略映射（真正值钱的部分）
+action-map.js
+export const ACTION_MAP = {
+  木: {
+    strategy: "学习与积累",
+    do: [
+      "提升认知与专业能力",
+      "扩大知识结构"
+    ],
+    avoid: [
+      "短期逐利",
+      "过度消耗精力"
+    ]
+  },
+  火: {
+    strategy: "曝光与突破",
+    do: [
+      "主动表达",
+      "尝试新方向"
+    ],
+    avoid: [
+      "情绪化决策",
+      "频繁变动"
+    ]
+  },
+  土: {
+    strategy: "稳态构建",
+    do: [
+      "夯实基础",
+      "长期规划"
+    ],
+    avoid: [
+      "盲目扩张",
+      "高杠杆"
+    ]
+  },
+  金: {
+    strategy: "结构优化",
+    do: [
+      "提高效率",
+      "优化流程"
+    ],
+    avoid: [
+      "过度控制",
+      "刚性对抗"
+    ]
+  },
+  水: {
+    strategy: "流动与连接",
+    do: [
+      "建立人脉",
+      "跨界合作"
+    ],
+    avoid: [
+      "目标分散",
+      "缺乏聚焦"
+    ]
+  }
+}
+
+五、最终决策引擎（B 的核心）
+decision-engine.js
+import { calcXiJi } from './xi-ji-engine'
+import { INDUSTRY_MAP } from './industry-map'
+import { ACTION_MAP } from './action-map'
+
+export function buildDecision({ wuxingMap, level }) {
+  const { xi, ji } = calcXiJi(wuxingMap)
+
+  const recommendIndustries = xi.flatMap(x => INDUSTRY_MAP[x])
+  const avoidIndustries = ji.flatMap(x => INDUSTRY_MAP[x])
+
+  const mainAction = ACTION_MAP[xi[0]]
+  const riskAction = ACTION_MAP[ji[0]]
+
+  return {
+    focus: xi,
+    caution: ji,
+
+    industries: {
+      recommend: recommendIndustries.slice(0,4),
+      avoid: avoidIndustries.slice(0,3)
+    },
+
+    action: {
+      strategy: mainAction.strategy,
+      do: mainAction.do,
+      avoid: riskAction.do
+    },
+
+    note:
+      level === '高位'
+        ? "顺势可放大，但需防止过度扩张"
+        : level === '低位'
+        ? "优先防守，避免高风险选择"
+        : "以稳健推进为主"
+  }
+}
+
+六、与 Explain（A）的自然融合方式
+
+在 K 线点击某一年时，你现在可以同时显示：
+
+【趋势判断】
+- 当前级别：偏强
+- 主导因素：社会环境
+
+【行动建议】
+- 当前适合：学习与积累
+- 重点行业：教育 / 咨询 / 设计
+- 需避免：过度逐利、短线博弈
+
+
+👉 这已经是“理性决策工具”，不是算命
+
+七、哪些地方还能继续升级（为后续做铺垫）
+升级点	说明
+行业权重	可按社会周期动态排序
+行动细化	职业 / 投资 / 关系
+个性化	性别 / 城市 / 年龄
+学习型	用户反馈反向调权
