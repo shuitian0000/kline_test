@@ -7,3 +7,12 @@ export function getDayPillar(date) {
   const diff = Math.floor((date - base) / 86400000);
   return ganzhiFromIndex(diff);
 }
+
+// function calcDayStrength(bazi) {
+//   let score = 1.0
+//   score += WUXING_VALUE[bazi.month.dzWuxing] * 0.4
+//   score += WUXING_VALUE[bazi.hour.dzWuxing] * 0.2
+//   score -= WUXING_VALUE[bazi.year.dzWuxing] * 0.1
+//   return clamp(score, 0.6, 1.4)
+// }
+
