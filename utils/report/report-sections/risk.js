@@ -1,4 +1,7 @@
-// 年度行动策略占位
+// 风险与边界（risk）
+// 输入
+// K线最大回撤
+// 社会波动
 
 export function buildRisk({ drawdown, socVol }) {
   return `
