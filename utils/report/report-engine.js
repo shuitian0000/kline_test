@@ -1,4 +1,5 @@
 // 年度报告生成引擎占位
+// 报告引擎总控（把所有章节拼起来）
 
 import { REPORT_STRUCTURE } from './report-structure'
 import * as sections from './report-sections'
