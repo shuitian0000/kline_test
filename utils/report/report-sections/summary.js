@@ -1,4 +1,5 @@
 // 一页总结占位
+// 一页总结（summary）
 
 export function buildSummary({ year, core }) {
   return `
