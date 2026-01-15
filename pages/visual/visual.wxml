@@ -1,1 +1,2 @@
 
+<view>决策风格: {{riskStyle}}</view><view>时间视角: {{timeFocus}}</view><view>建议密度: {{adviceDensity}}</view>
