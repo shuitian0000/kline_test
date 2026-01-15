@@ -1,4 +1,8 @@
 // 年度行动策略
+// 年度行动策略（strategy）【最值钱】
+// 输入
+// Explain 级别
+// 决策模块（B）的行动策略
 
 export function buildStrategy({ level, action }) {
   return `
