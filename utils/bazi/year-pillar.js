@@ -7,3 +7,5 @@ export function getYearPillar(year, afterLichun) {
   const idx = afterLichun ? base : base - 1;
   return ganzhiFromIndex(idx);
 }
+
+
