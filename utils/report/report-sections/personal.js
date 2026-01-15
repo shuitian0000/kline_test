@@ -1,4 +1,8 @@
 // 个人结构分析占位
+// 输入：
+// 八字因子均值
+// 阶段因子
+// 喜忌五行
 
 export function buildPersonal({ bzAvg, phase, xi, ji }) {
   return `
