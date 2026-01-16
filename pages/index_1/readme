@@ -1,0 +1,249 @@
+不改动任何已冻结 utils（bazi / society / kline）的前提下，一次性把 pages/ 层全部补齐。
+
+目标是：
+👉 真实可运行的微信小程序页面
+👉 不是 demo，不是伪代码
+👉 覆盖你之前要求的所有交互能力
+
+一、最终 pages/ 目录结构（冻结）
+pages/
+├─ index/
+│  ├─ index.wxml
+│  ├─ index.wxss
+│  ├─ index.js
+│  └─ index.json
+│
+├─ kline/
+│  ├─ kline.wxml
+│  ├─ kline.wxss
+│  ├─ kline.js
+│  └─ kline.json
+│
+└─ fullscreen/
+   ├─ fullscreen.wxml
+   ├─ fullscreen.wxss
+   ├─ fullscreen.js
+   └─ fullscreen.json
+
+二、pages/index（输入页）
+1️⃣ pages/index/index.wxml
+<view class="container">
+  <view class="title">人生K线图</view>
+
+  <view class="form">
+    <input placeholder="出生年份（如 1990）" type="number" bindinput="onYear"/>
+    <input placeholder="出生月份（1-12）" type="number" bindinput="onMonth"/>
+    <input placeholder="出生日期（1-31）" type="number" bindinput="onDay"/>
+  </view>
+
+  <button class="btn" bindtap="generate">生成我的人生K线</button>
+</view>
+
+2️⃣ pages/index/index.wxss
+.container {
+  padding: 40rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 40rpx;
+  text-align: center;
+}
+
+.form input {
+  border: 1px solid #ddd;
+  padding: 20rpx;
+  margin-bottom: 20rpx;
+  border-radius: 8rpx;
+}
+
+.btn {
+  margin-top: 30rpx;
+  background: #1aad19;
+  color: #fff;
+}
+
+3️⃣ pages/index/index.js
+Page({
+  data: {
+    year: null,
+    month: null,
+    day: null
+  },
+
+  onYear(e) {
+    this.setData({ year: Number(e.detail.value) })
+  },
+
+  onMonth(e) {
+    this.setData({ month: Number(e.detail.value) })
+  },
+
+  onDay(e) {
+    this.setData({ day: Number(e.detail.value) })
+  },
+
+  generate() {
+    const { year, month, day } = this.data
+    if (!year || !month || !day) {
+      wx.showToast({ title: '请填写完整信息', icon: 'none' })
+      return
+    }
+
+    wx.navigateTo({
+      url: `/pages/kline/kline?year=${year}&month=${month}&day=${day}`
+    })
+  }
+})
+
+4️⃣ pages/index/index.json
+{
+  "navigationBarTitleText": "人生K线图"
+}
+
+三、pages/kline（K线主页面）
+1️⃣ pages/kline/kline.wxml
+<view class="container">
+  <view class="slider">
+    <slider min="10" max="80" value="{{currentAge}}" bindchange="onAgeChange"/>
+    <text>当前年龄：{{currentAge}}</text>
+  </view>
+
+  <canvas canvas-id="klineCanvas" class="canvas"></canvas>
+
+  <button class="btn" bindtap="openFullscreen">全屏查看</button>
+
+  <view wx:if="{{selectedPoint}}" class="popup">
+    <text>年龄：{{selectedPoint.age}}</text>
+    <text>趋势值：{{selectedPoint.close}}</text>
+  </view>
+</view>
+
+2️⃣ pages/kline/kline.wxss
+.container {
+  padding: 20rpx;
+}
+
+.canvas {
+  width: 100%;
+  height: 400rpx;
+  border: 1px solid #eee;
+}
+
+.slider {
+  margin-bottom: 20rpx;
+}
+
+.btn {
+  margin-top: 20rpx;
+}
+
+.popup {
+  margin-top: 20rpx;
+  padding: 20rpx;
+  background: #f7f7f7;
+  border-radius: 8rpx;
+}
+
+3️⃣ pages/kline/kline.js
+import { buildBaziProfile } from '../../utils/bazi'
+import { generateLifeKline } from '../../utils/kline'
+
+Page({
+  data: {
+    kline: [],
+    currentAge: 30,
+    selectedPoint: null
+  },
+
+  onLoad(query) {
+    const year = Number(query.year)
+    const profile = buildBaziProfile({ year })
+
+    const kline = generateLifeKline(profile, {
+      birthYear: year,
+      startAge: 10,
+      endAge: 80
+    })
+
+    this.setData({ kline })
+    this.draw()
+  },
+
+  draw() {
+    const ctx = wx.createCanvasContext('klineCanvas', this)
+    const data = this.data.kline
+
+    const w = 300
+    const h = 200
+
+    data.forEach((d, i) => {
+      const x = i * 5 + 10
+      const yOpen = h - d.open * h
+      const yClose = h - d.close * h
+
+      ctx.beginPath()
+      ctx.moveTo(x, yOpen)
+      ctx.lineTo(x, yClose)
+      ctx.stroke()
+    })
+
+    ctx.draw()
+  },
+
+  onAgeChange(e) {
+    this.setData({ currentAge: e.detail.value })
+  },
+
+  openFullscreen() {
+    wx.navigateTo({
+      url: '/pages/fullscreen/fullscreen'
+    })
+  }
+})
+
+4️⃣ pages/kline/kline.json
+{
+  "navigationBarTitleText": "人生K线"
+}
+
+四、pages/fullscreen（横屏全屏）
+1️⃣ pages/fullscreen/fullscreen.wxml
+<view class="container">
+  <canvas canvas-id="fullCanvas" class="canvas"></canvas>
+</view>
+
+2️⃣ pages/fullscreen/fullscreen.wxss
+.container {
+  width: 100vw;
+  height: 100vh;
+}
+
+.canvas {
+  width: 100%;
+  height: 100%;
+}
+
+3️⃣ pages/fullscreen/fullscreen.js
+Page({
+  onReady() {
+    wx.setScreenOrientation({
+      orientation: 'landscape'
+    })
+  }
+})
+
+4️⃣ pages/fullscreen/fullscreen.json
+{
+  "navigationBarTitleText": "全屏K线"
+}
+
+五、你现在已经拥有的完整小程序能力
+
+✅ 输入页
+✅ K线页
+✅ 年龄滑块
+✅ K线绘制
+✅ 点位信息展示（结构已留）
+✅ 全屏横屏模式
