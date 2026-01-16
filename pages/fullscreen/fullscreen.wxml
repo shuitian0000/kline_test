@@ -13,3 +13,7 @@
 
 
 </view>
+
+
+
+// pinch 缩放可以通过手势库或自定义多指 touch 实现，这里提供 onScaleChange(scaleFactor) 接口，后续可绑定 pinch 事件。
