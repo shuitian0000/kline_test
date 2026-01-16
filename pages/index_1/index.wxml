@@ -1,0 +1,11 @@
+<view class="container">
+  <view class="title">人生K线图</view>
+
+  <view class="form">
+    <input placeholder="出生年份（如 1990）" type="number" bindinput="onYear"/>
+    <input placeholder="出生月份（1-12）" type="number" bindinput="onMonth"/>
+    <input placeholder="出生日期（1-31）" type="number" bindinput="onDay"/>
+  </view>
+
+  <button class="btn" bindtap="generate">生成我的人生K线</button>
+</view>
