@@ -1,0 +1,191 @@
+严格遵守 唯一最终冻结版原则 来分析和实现 年度报告方案（Annual Report），并融入当前小程序：
+
+不删除原有文件
+
+只新增文件和必要修改，并标注修改内容
+
+功能目标：生成年度总结报告，包括八字 + 社会周期 + K 线 + 系统进化结果，可选择导出或在小程序内查看
+
+一、当前最终冻结版分析
+
+现有功能：
+
+八字计算 → utils/bazi
+
+社会周期 → utils/society
+
+K 线融合 → utils/kline
+
+点位解释 → utils/explain
+
+系统进化 → utils/evolve
+
+付费控制 → utils/payment
+
+年度报告：
+
+当前最终冻结版 未包含年度报告生成或展示
+
+需要新增一个模块，整合：
+
+K 线点位数据
+
+进化评分
+
+点位解释
+
+社会周期趋势
+
+二、新增目录与文件
+utils/
+└─ report/
+   ├─ index.js       # 统一导出
+   ├─ report.js      # 核心报告生成逻辑
+   └─ templates.js   # 文本模板
+
+三、新增文件内容
+1️⃣ utils/report/index.js
+import { generateAnnualReport } from './report'
+
+export { generateAnnualReport }
+
+2️⃣ utils/report/report.js
+import { TEMPLATES } from './templates'
+import { generateEvolutionExplanation } from '../evolve'
+import { TEMPLATES as EXPLAIN_TEMPLATES } from '../explain'
+
+/**
+ * 生成年度报告
+ * @param {Object[]} klineData - K线数组 [{year, open, close, high, low, explanation, evolve}]
+ * @param {Object} profile - 用户信息 {birthYear, name, ...}
+ * @returns {Object} 年度报告
+ */
+export function generateAnnualReport(klineData, profile) {
+  const report = []
+
+  klineData.forEach(point => {
+    // 原始解释
+    const { explanation } = point
+
+    // 进化解释
+    const evolveExplanation = generateEvolutionExplanation(point.evolve)
+
+    // 社会周期趋势
+    const socialTrend = point.societyScore || 0.5
+    let societyText = ''
+    if (socialTrend > 0.7) societyText = '社会环境稳定，有利发展'
+    else if (socialTrend < 0.3) societyText = '社会波动较大，需谨慎'
+    else societyText = '社会环境平稳，可稳步推进'
+
+    report.push({
+      year: point.year,
+      originalExplanation: explanation,
+      evolve: point.evolve,
+      evolveExplanation,
+      societyTrend: societyText
+    })
+  })
+
+  // 汇总分析
+  const highEvolveYears = report.filter(r => r.evolve.score > 0.7).map(r => r.year)
+  const lowEvolveYears = report.filter(r => r.evolve.score < 0.3).map(r => r.year)
+
+  return {
+    user: profile,
+    yearlyReport: report,
+    summary: {
+      highGrowthYears: highEvolveYears,
+      lowGrowthYears: lowEvolveYears,
+      advice: '合理安排关键年份，抓住高成长期机会，稳健度过低迷期'
+    }
+  }
+}
+
+3️⃣ utils/report/templates.js
+export const TEMPLATES = {
+  header: '年度人生分析报告',
+  footer: '报告仅作参考，祝你稳步成长，健康幸福',
+  evolveSection: '系统进化分析部分，显示每年的成长评分与趋势',
+  societySection: '社会周期分析，展示每年环境趋势'
+}
+
+四、原文件修改（标注修改）
+
+为了在 K 线页面 和 全屏页面 提供“生成年度报告”功能，需要修改：
+
+文件：pages/kline/kline.js
+修改内容：
+
+导入年度报告模块
+
+// 新增导入
+import { generateAnnualReport } from '../../utils/report'
+
+
+新增生成年度报告函数
+
+generateReport() {
+  const report = generateAnnualReport(this.data.kline, this.data.user)
+  wx.setStorageSync('annualReport', report)
+  wx.showToast({ title: '年度报告生成成功', icon: 'success' })
+  this.setData({ report })
+}
+
+
+新增按钮调用
+
+在页面上可以增加一个“生成年度报告”按钮，调用 generateReport()
+
+五、功能效果
+
+年度报告包含：
+
+每年的原始解释文本（K 线 + 点位解释）
+
+系统进化评分和趋势
+
+社会周期趋势
+
+高成长年份 / 低成长年份总结
+
+总体建议
+
+完全兼容最终冻结版：
+
+不删除原有 utils 或 pages 文件
+
+仅新增 utils/report/
+
+小范围修改 kline.js
+
+保留 Canvas 绘制、滑动、缩放、点击解释功能
+
+可与付费功能结合：
+
+可通过 utils/payment.ensureAccess 控制是否显示完整报告
+
+六、最终冻结版目录（增加 evolve + payment + report）
+utils/
+├─ bazi/
+├─ society/
+├─ kline/
+├─ explain/
+├─ evolve/       # 系统进化模块
+├─ payment/      # 付费控制模块
+└─ report/       # 年度报告模块
+
+pages/
+├─ index/
+├─ kline/
+└─ fullscreen/
+
+
+✅ 现在最终冻结版 已包含年度报告功能，遵守：
+
+唯一冻结版原则
+
+不删除原有文件
+
+所有新增文件清晰标注
+
+修改 kline.js 明确标注
