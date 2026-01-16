@@ -6,8 +6,8 @@ import { calcSocietyFactor } from '../../utils/society'
 import { evolvePoint, generateEvolutionExplanation } from '../../utils/evolve'
 // 新增导入,for payment
 import { ensureAccess } from '../../utils/payment'
-
-
+// 新增导入,for report
+import { generateAnnualReport } from '../../utils/report'
 
 Page({
   data: {
@@ -15,6 +15,14 @@ Page({
     currentAge: 30,
     selectedPoint: null
   },
+
+  generateReport() {
+  const report = generateAnnualReport(this.data.kline, this.data.user)
+  wx.setStorageSync('annualReport', report)
+  wx.showToast({ title: '年度报告生成成功', icon: 'success' })
+  this.setData({ report })
+},
+
 
   onLoad(query) {
     const year = Number(query.year)
