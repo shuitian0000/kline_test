@@ -56,6 +56,26 @@ pages/report 功能在最终冻结版中 不再使用
 
 未来如需导出报告或打印功能，可独立创建新页面，不影响冻结版
 
+kline_life_final/
+├─ utils/
+│  ├─ bazi/
+│  ├─ society/
+│  ├─ kline/
+│  ├─ explain/
+│  ├─ evolve/
+│  ├─ payment/
+│  ├─ report/
+│  └─ decision/
+├─ pages/
+│  ├─ index/
+│  ├─ kline/
+│  └─ fullscreen/
+├─ app.js
+├─ app.json
+├─ app.wxss
+├─ project.config.json
+└─ package.json
+
 -------------------------------------------------------
 画一个 最终冻结版小程序的数据流图，严格遵守唯一冻结版原则，并说明数据流向、计算逻辑以及缓存机制。
 
