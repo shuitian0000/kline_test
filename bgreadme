@@ -76,6 +76,10 @@ kline_life_final/
 ├─ project.config.json
 └─ package.json
 
+全部 utils 模块：bazi, society, kline, explain, evolve, payment, report, decision
+pages：index, kline, fullscreen
+优化 1~4 功能
+年度报告、系统进化、付费、可行到决策工具功
 -------------------------------------------------------
 画一个 最终冻结版小程序的数据流图，严格遵守唯一冻结版原则，并说明数据流向、计算逻辑以及缓存机制。
 
