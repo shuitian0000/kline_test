@@ -1,6 +1,15 @@
 <view class="container">
 
   // 绘制时绑定 canvas 点击事件
-  <canvas canvas-id="fullCanvas" class="canvas" bindtap="onCanvasTap"></canvas>
+  // <canvas canvas-id="fullCanvas" class="canvas" bindtap="onCanvasTap"></canvas>
+  <canvas
+  canvas-id="fullCanvas"
+  class="canvas"
+  bindtap="onCanvasTap"
+  bindtouchstart="onTouchStart"
+  bindtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+  />
+
 
 </view>
