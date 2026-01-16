@@ -1,4 +1,5 @@
 // pages/kline/kline.js
+// K线绘制 + 交互
 import { explainPoint } from '../../utils/destiny/explain-engine'
 
 Page({
