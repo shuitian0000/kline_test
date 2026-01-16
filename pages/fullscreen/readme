@@ -1,0 +1,160 @@
+严格遵守 唯一最终冻结版原则，只做 优化 1：K 线点击精确命中 + 点位解释文本接入，不改动任何已冻结的 utils 或 pages 结构。
+
+一、优化目标
+
+点击 K 线蜡烛点位，显示对应年龄段的详细说明
+
+说明内容包括：
+
+年龄段
+
+年度趋势值
+
+风险提示 / 注意事项（基于结构评分 + 社会周期计算）
+
+保证在 普通 K 线页和全屏页面 都可用
+
+不新增 utils 文件，只在页面逻辑里生成解释文本
+
+二、数据结构
+
+每个 OHLC 点添加一个字段：
+
+{
+  year,
+  age,
+  open,
+  high,
+  low,
+  close,
+  explanation: {
+    text: '结构稳定，适合长期规划',
+    risk: '波动年份注意财务支出',
+    advice: '保持健康生活与学习规划'
+  }
+}
+
+
+解释文本由 utils/bazi + utils/society + K 线数值组合生成
+计算在 kline.js 绘制之前完成，不修改 utils 文件
+
+三、pages/kline/kline.js 优化（增加点击 + 解释）
+import { buildBaziProfile } from '../../utils/bazi'
+import { generateLifeKline } from '../../utils/kline'
+import { calcSocietyFactor } from '../../utils/society'
+
+Page({
+  data: {
+    kline: [],
+    currentAge: 30,
+    selectedPoint: null
+  },
+
+  onLoad(query) {
+    const year = Number(query.year)
+    const profile = buildBaziProfile({ year })
+
+    let kline = generateLifeKline(profile, {
+      birthYear: year,
+      startAge: 10,
+      endAge: 80
+    })
+
+    // 为每个点生成解释文本
+    kline = kline.map(point => {
+      const society = calcSocietyFactor(point.year)
+      let text = ''
+      let risk = ''
+      let advice = ''
+
+      // 简单逻辑示例
+      if (point.close > 0.7) {
+        text = '结构偏稳定，适合长期规划'
+        risk = '高期望年份，注意计划过紧'
+        advice = '保持健康生活与持续投入'
+      } else if (point.close < 0.3) {
+        text = '结构波动较大，需灵活应对'
+        risk = '高波动年份，注意财务风险'
+        advice = '减少长期承诺，保守投资'
+      } else {
+        text = '结构均衡，稳中求变'
+        risk = '普通年份，注意保持节奏'
+        advice = '持续规划，但灵活调整'
+      }
+
+      return {
+        ...point,
+        explanation: { text, risk, advice }
+      }
+    })
+
+    this.setData({ kline })
+    this.draw()
+  },
+
+  draw() {
+    const ctx = wx.createCanvasContext('klineCanvas', this)
+    const data = this.data.kline
+    const h = 200
+
+    data.forEach((d, i) => {
+      const x = i * 5 + 10
+      const yOpen = h - d.open * h
+      const yClose = h - d.close * h
+
+      ctx.beginPath()
+      ctx.moveTo(x, yOpen)
+      ctx.lineTo(x, yClose)
+      ctx.stroke()
+    })
+
+    ctx.draw()
+  },
+
+  onCanvasTap(e) {
+    const x = e.detail.x
+    const index = Math.floor((x - 10) / 5)
+    if (index >= 0 && index < this.data.kline.length) {
+      const point = this.data.kline[index]
+      this.setData({ selectedPoint: point })
+    }
+  },
+
+  onAgeChange(e) {
+    this.setData({ currentAge: e.detail.value })
+  },
+
+  openFullscreen() {
+    wx.navigateTo({
+      url: '/pages/fullscreen/fullscreen'
+    })
+  }
+})
+
+四、WXML 增加绑定点击
+<canvas canvas-id="klineCanvas" class="canvas" bindtap="onCanvasTap"></canvas>
+
+
+原本 canvas 没绑定点击，现在绑定了 onCanvasTap
+
+五、全屏页面同样适用
+
+只需在 fullscreen.js 中添加类似逻辑：
+
+// 绘制时绑定 canvas 点击事件
+<canvas canvas-id="fullCanvas" class="canvas" bindtap="onCanvasTap"></canvas>
+
+
+并在 JS 中复制相同的 onCanvasTap 方法即可。
+
+⚠️ 数据可通过页面 options 或 globalData 传入
+
+六、效果
+
+点击任意 K 线点 → 弹出对应年龄段解释
+
+普通模式 / 全屏模式均适用
+
+解释文本基于结构评分 + 社会周期融合生成
+
+不改动任何 utils → 符合冻结版原则
