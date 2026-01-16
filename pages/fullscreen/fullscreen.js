@@ -91,6 +91,14 @@ Page({
     this.setData({ isTouching: false })
   },
 
+//optional, for payment
+// onFullScreenToggle() {
+//   const hasAccess = ensureAccess(this.data.user, 'fullscreen')
+//   if (!hasAccess) return
+//   wx.setScreenOrientation({ orientation: 'landscape' })
+// },
+
+
   // 缩放
   onScaleChange(scaleFactor) {
     const newScale = Math.max(0.5, Math.min(3, this.data.scale * scaleFactor))
