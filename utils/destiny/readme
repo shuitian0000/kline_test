@@ -1,0 +1,50 @@
+严格遵守 唯一最终冻结版原则，来确认 utils/destiny 的定位和状态。
+
+一、utils/destiny 组件功能回顾
+
+历史设计：
+
+早期版本里，utils/destiny/ 是做“命运评分 / 人生趋势计算”的工具
+
+与 utils/bazi、utils/kline、utils/explain 结合，用于生成文本或数值预测
+
+最终冻结版原则：
+
+我们把所有核心数值计算（八字 + 社会周期 + K 线融合）都整合到 utils/bazi / utils/society / utils/kline
+
+文本解释统一用 utils/explain
+
+结论：
+
+最终冻结版已经不再需要 utils/destiny
+
+它的功能已被 bazi + society + kline + explain 覆盖
+
+保留它只会造成重复和混乱，不符合冻结版原则
+
+二、是否需要 utils/destiny
+
+✅ 最终冻结版不需要这个目录
+
+所以 删除 / 不生成 utils/destiny/
+
+所有命运计算和点位解释都在现有工具链里完成
+
+三、总结
+
+原有功能 → 已合并到 utils/bazi、utils/society、utils/kline
+
+文本解释 → 已统一到 utils/explain
+
+维护原则 → 不新增 utils/destiny，也不改动任何现有冻结版
+
+冻结目录清单最终确认：
+
+utils/
+├─ bazi/       # 八字核心算法
+├─ society/    # 社会周期算法
+├─ kline/      # 人生K线融合算法
+└─ explain/    # 点位解释文本生成
+
+
+以后任何扩展，只能新增目录或文件，不得修改这四个 utils 的目录结构或文件内容
