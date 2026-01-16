@@ -1,0 +1,58 @@
+严格遵守 唯一最终冻结版原则，来确认 utils/decision 的定位和状态。
+
+一、utils/decision 组件功能回顾
+
+历史设计：
+
+早期版本里，utils/decision/ 用于“决策辅助系统”
+
+功能包括：
+
+根据八字结构 + 社会周期 + K 线数据给出决策建议
+
+可能会生成任务指引、行动建议或优先级策略
+
+与 utils/evolve 联动，模拟不同选择对人生趋势的影响
+
+最终冻结版原则下的现状：
+
+所有 核心数值 + 趋势分析 + 文本解释 已由：
+
+utils/bazi → 个体结构 / 八字 / 流年
+
+utils/society → 社会周期
+
+utils/kline → 数值融合成 OHLC
+
+utils/explain → 点位解释
+
+决策逻辑本质上属于 增强模拟 / 可选策略，并未纳入最终冻结版
+
+保留 utils/decision 会 破坏唯一冻结版
+
+二、是否需要 utils/decision
+
+✅ 最终冻结版不再需要 utils/decision
+
+决策功能未纳入核心小程序目标
+
+核心功能已经由 4 个 utils 完整覆盖
+
+冻结版目录最终确认：
+
+utils/
+├─ bazi/       # 八字核心算法
+├─ society/    # 社会周期算法
+├─ kline/      # 人生K线融合算法
+└─ explain/    # 点位解释文本生成
+
+
+所以 不生成 utils/decision
+
+三、结论
+
+utils/decision 功能在最终冻结版中 不再使用
+
+保留会破坏最终冻结版唯一性
+
+若后续需要高级决策模拟，可新建独立目录，不影响现有冻结版
