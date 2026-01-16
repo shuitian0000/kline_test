@@ -13,6 +13,18 @@ Page({
     const year = Number(query.year)
     const profile = buildBaziProfile({ year })
 
+    const cacheKey = `kline_${year}`
+
+   // 尝试从本地缓存读取
+    let cached = wx.getStorageSync(cacheKey)
+    if (cached && cached.length) {
+      this.setData({ kline: cached })
+      this.draw()
+      return
+    }
+
+    // 如果没有缓存，生成
+    const profile = buildBaziProfile({ year })
     let kline = generateLifeKline(profile, {
       birthYear: year,
       startAge: 10,
@@ -47,7 +59,14 @@ Page({
       }
     })
 
+
+    // 设置内存数据
     this.setData({ kline })
+
+    // 写入本地缓存
+    wx.setStorageSync(cacheKey, kline)
+
+    // 绘制
     this.draw()
   },
 
@@ -90,7 +109,9 @@ Page({
   },
 
   onCanvasTap(e) {
-    const x = e.detail.x
+    const x = e.detail.x    
+    const barWidth = 4
+    const spacing = 2
     const index = Math.floor((x - 10) / 5)
     if (index >= 0 && index < this.data.kline.length) {
       const point = this.data.kline[index]
