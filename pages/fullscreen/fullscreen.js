@@ -1,63 +1,166 @@
 Page({
+  data: {
+    kline: [],        // K 线数据
+    offsetX: 0,       // 水平偏移量
+    scale: 1,         // K 线缩放比例
+    startX: 0,        // 滑动起点
+    isTouching: false,
+    selectedPoint: null
+  },
 
-onReady() {
-  wx.setScreenOrientation({ orientation: 'landscape' })
-  this.drawFullCanvas()
-},
+  onLoad(options) {
+    const kline = options.klineData || []
+    this.setData({ kline })
+    this.draw()
+  },
 
-drawFullCanvas() {
-  const ctx = wx.createCanvasContext('fullCanvas', this)
-  const kline = this.data.kline || []
-  const canvasHeight = 300
-  const canvasWidth = wx.getSystemInfoSync().windowWidth
-  const barWidth = 6
-  const spacing = 3
+  onReady() {
+    wx.setScreenOrientation({ orientation: 'landscape' })
+  },
 
-  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+  draw() {
+    const ctx = wx.createCanvasContext('fullCanvas', this)
+    const data = this.data.kline
+    const canvasHeight = 300
+    const canvasWidth = wx.getSystemInfoSync().windowWidth
+    const baseBarWidth = 6
+    const spacing = 3
+    const barWidth = baseBarWidth * this.data.scale
+    const offsetX = this.data.offsetX
 
-  kline.forEach((d, i) => {
-    const x = i * (barWidth + spacing) + 10
-    const openY = canvasHeight - d.open * canvasHeight
-    const closeY = canvasHeight - d.close * canvasHeight
-    const highY = canvasHeight - d.high * canvasHeight
-    const lowY = canvasHeight - d.low * canvasHeight
+    ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-    const color = d.close >= d.open ? '#ff4d4f' : '#4caf50'
-    ctx.setStrokeStyle(color)
-    ctx.setFillStyle(color)
+    data.forEach((d, i) => {
+      const x = i * (barWidth + spacing) + 10 + offsetX
+      if (x < -barWidth || x > canvasWidth) return // 剔除屏幕外绘制
 
-    // 高低线
-    ctx.beginPath()
-    ctx.moveTo(x + barWidth / 2, highY)
-    ctx.lineTo(x + barWidth / 2, lowY)
-    ctx.stroke()
+      const openY = canvasHeight - d.open * canvasHeight
+      const closeY = canvasHeight - d.close * canvasHeight
+      const highY = canvasHeight - d.high * canvasHeight
+      const lowY = canvasHeight - d.low * canvasHeight
 
-    // 矩形蜡烛
-    const rectY = Math.min(openY, closeY)
-    const rectHeight = Math.abs(openY - closeY)
-    ctx.fillRect(x, rectY, barWidth, rectHeight || 1)
-  })
+      const color = d.close >= d.open ? '#ff4d4f' : '#4caf50'
+      ctx.setStrokeStyle(color)
+      ctx.setFillStyle(color)
 
-  ctx.draw()
-},
+      // 高低线
+      ctx.beginPath()
+      ctx.moveTo(x + barWidth / 2, highY)
+      ctx.lineTo(x + barWidth / 2, lowY)
+      ctx.stroke()
 
-onCanvasTap(e) {
-  const x = e.detail.x
-  const barWidth = 6
-  const spacing = 3
-  const index = Math.floor((x - 10) / (barWidth + spacing))
-  if (index >= 0 && index < this.data.kline.length) {
-    this.setData({ selectedPoint: this.data.kline[index] })
+      // 蜡烛矩形
+      const rectY = Math.min(openY, closeY)
+      const rectHeight = Math.abs(openY - closeY)
+      ctx.fillRect(x, rectY, barWidth, rectHeight || 1)
+    })
+
+    ctx.draw()
+  },
+
+  // 点击事件显示解释
+  onCanvasTap(e) {
+    const touchX = e.detail.x
+    const baseBarWidth = 6
+    const spacing = 3
+    const barWidth = baseBarWidth * this.data.scale
+    const offsetX = this.data.offsetX
+
+    const index = Math.floor((touchX - 10 - offsetX) / (barWidth + spacing))
+    if (index >= 0 && index < this.data.kline.length) {
+      this.setData({ selectedPoint: this.data.kline[index] })
+    }
+  },
+
+  // 滑动事件
+  onTouchStart(e) {
+    this.setData({ startX: e.touches[0].clientX, isTouching: true })
+  },
+
+  onTouchMove(e) {
+    if (!this.data.isTouching) return
+    const deltaX = e.touches[0].clientX - this.data.startX
+    this.setData({
+      offsetX: this.data.offsetX + deltaX,
+      startX: e.touches[0].clientX
+    })
+    this.draw()
+  },
+
+  onTouchEnd() {
+    this.setData({ isTouching: false })
+  },
+
+  // 缩放
+  onScaleChange(scaleFactor) {
+    const newScale = Math.max(0.5, Math.min(3, this.data.scale * scaleFactor))
+    this.setData({ scale: newScale })
+    this.draw()
   }
-}
+})
+
+
+
+// Page({
+
+// onReady() {
+//   wx.setScreenOrientation({ orientation: 'landscape' })
+//   this.drawFullCanvas()
+// },
+
+// drawFullCanvas() {
+//   const ctx = wx.createCanvasContext('fullCanvas', this)
+//   const kline = this.data.kline || []
+//   const canvasHeight = 300
+//   const canvasWidth = wx.getSystemInfoSync().windowWidth
+//   const barWidth = 6
+//   const spacing = 3
+
+//   ctx.clearRect(0, 0, canvasWidth, canvasHeight)
+
+//   kline.forEach((d, i) => {
+//     const x = i * (barWidth + spacing) + 10
+//     const openY = canvasHeight - d.open * canvasHeight
+//     const closeY = canvasHeight - d.close * canvasHeight
+//     const highY = canvasHeight - d.high * canvasHeight
+//     const lowY = canvasHeight - d.low * canvasHeight
+
+//     const color = d.close >= d.open ? '#ff4d4f' : '#4caf50'
+//     ctx.setStrokeStyle(color)
+//     ctx.setFillStyle(color)
+
+//     // 高低线
+//     ctx.beginPath()
+//     ctx.moveTo(x + barWidth / 2, highY)
+//     ctx.lineTo(x + barWidth / 2, lowY)
+//     ctx.stroke()
+
+//     // 矩形蜡烛
+//     const rectY = Math.min(openY, closeY)
+//     const rectHeight = Math.abs(openY - closeY)
+//     ctx.fillRect(x, rectY, barWidth, rectHeight || 1)
+//   })
+
+//   ctx.draw()
+// },
+
+// onCanvasTap(e) {
+//   const x = e.detail.x
+//   const barWidth = 6
+//   const spacing = 3
+//   const index = Math.floor((x - 10) / (barWidth + spacing))
+//   if (index >= 0 && index < this.data.kline.length) {
+//     this.setData({ selectedPoint: this.data.kline[index] })
+//   }
+// }
 
   
-  // onReady() {
-  //   wx.setScreenOrientation({
-  //     orientation: 'landscape'
-  //   })
-  // }
-})
+//   // onReady() {
+//   //   wx.setScreenOrientation({
+//   //     orientation: 'landscape'
+//   //   })
+//   // }
+// })
 
 
 // 一、目标
