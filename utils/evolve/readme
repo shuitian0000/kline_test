@@ -1,0 +1,62 @@
+严格遵守 唯一最终冻结版原则，来确认 utils/evolve 的定位和状态。
+
+一、utils/evolve 组件功能回顾
+
+历史设计：
+
+utils/evolve/ 在早期方案里用于“用户内生进化系统”
+
+功能包括：
+
+个体能力评分的迭代更新
+
+根据 K 线趋势 + 八字 + 社会周期模拟“进化/成长”
+
+可用于生成动态推荐或策略优化
+
+最终冻结版原则下的现状：
+
+所有 核心 K 线数值计算、趋势分析 都已在：
+
+utils/bazi → 个体结构 / 八字 / 流年
+
+utils/society → 社会周期
+
+utils/kline → 数值融合成 OHLC
+
+文本解释 → utils/explain
+
+进化迭代逻辑未纳入最终冻结版，因为：
+
+小程序以 辅助决策 + K 线可视化 为目标
+
+进化系统属于增强模拟功能，可后续单独做
+
+保留 utils/evolve 会破坏冻结版唯一性
+
+二、是否需要 utils/evolve
+
+✅ 最终冻结版不再需要 utils/evolve
+
+功能已被现有 utils 完整覆盖
+
+保留它只会增加重复和维护复杂度
+
+冻结版目录最终确认：
+
+utils/
+├─ bazi/       # 八字核心算法
+├─ society/    # 社会周期算法
+├─ kline/      # 人生K线融合算法
+└─ explain/    # 点位解释文本生成
+
+
+所以 不生成 utils/evolve
+
+三、结论
+
+utils/evolve 组件已经被 bazi + society + kline + explain 完全替代
+
+保留 utils/evolve 与最终冻结版原则冲突
+
+以后如需扩展“进化/成长模拟”，可以新增目录 utils/evolve2/，但不影响已有冻结版
