@@ -1,0 +1,196 @@
+严格遵守 唯一最终冻结版原则 来实现 可行到决策工具（Feasible-to-Decision Tool），并融入当前小程序。
+
+不删除原有文件
+
+只新增文件和必要修改，并标注修改内容
+
+功能目标：基于八字、社会周期、K 线和系统进化结果，生成“可行操作列表”及决策建议，可结合付费功能控制高级建议显示
+
+一、当前最终冻结版分析
+
+现有功能：
+
+八字 → utils/bazi
+
+社会周期 → utils/society
+
+K 线融合 → utils/kline
+
+点位解释 → utils/explain
+
+系统进化 → utils/evolve
+
+付费控制 → utils/payment
+
+年度报告 → utils/report
+
+可行到决策工具：
+
+当前冻结版 未包含独立的决策工具
+
+需要新增模块 utils/decision/
+
+功能整合：
+
+K 线 + 进化评分 + 社会周期 → 生成可行动作列表
+
+高分年份 → 建议挑战/学习/投资
+
+低分年份 → 建议保守/休整/风险控制
+
+可付费控制部分高级决策
+
+二、新增目录与文件
+utils/
+└─ decision/
+   ├─ index.js        # 统一导出
+   ├─ decision.js     # 核心决策逻辑
+   └─ templates.js    # 决策文本模板
+
+三、新增文件内容
+1️⃣ utils/decision/index.js
+import { generateDecisions } from './decision'
+
+export { generateDecisions }
+
+2️⃣ utils/decision/decision.js
+import { TEMPLATES } from './templates'
+import { checkPremiumAccess } from '../payment'
+
+/**
+ * 可行到决策工具
+ * @param {Object[]} klineData - K 线数组 [{year, evolve, societyTrend}]
+ * @param {Object} user - 用户信息
+ * @returns {Object[]} 每年可行动作与建议
+ */
+export function generateDecisions(klineData, user) {
+  return klineData.map(point => {
+    const { evolve, societyTrend } = point
+
+    // 基础可行动作列表
+    let actions = []
+    if (evolve.score > 0.7) {
+      actions.push('抓住机会学习/投资')
+      actions.push('尝试挑战新项目')
+    } else if (evolve.score < 0.3) {
+      actions.push('降低风险，稳步推进')
+      actions.push('休整与总结经验')
+    } else {
+      actions.push('维持现有节奏')
+      actions.push('小幅优化当前计划')
+    }
+
+    // 社会环境提示
+    if (societyTrend.includes('波动')) actions.push('注意社会环境变化')
+
+    // 高级决策（仅会员可见）
+    let advancedAdvice = ''
+    if (checkPremiumAccess(user, 'decisionTool')) {
+      if (evolve.score > 0.8) advancedAdvice = '建议尝试跨领域发展，积累战略资源'
+      else if (evolve.score < 0.2) advancedAdvice = '建议降低杠杆风险，避免大决策'
+      else advancedAdvice = '适合稳健尝试新策略'
+    } else {
+      advancedAdvice = '开通会员可查看高级决策建议'
+    }
+
+    return {
+      year: point.year,
+      actions,
+      advancedAdvice
+    }
+  })
+}
+
+3️⃣ utils/decision/templates.js
+export const TEMPLATES = {
+  highScore: {
+    text: '此年份为高成长期，适合主动挑战与成长',
+    advice: '增加投入，尝试新领域或项目'
+  },
+  lowScore: {
+    text: '此年份为低迷期，适合稳步推进',
+    advice: '降低风险，先稳住现有状态'
+  },
+  normalScore: {
+    text: '此年份为平稳期，稳中求进',
+    advice: '持续优化已有成果，积累经验'
+  }
+}
+
+四、原文件修改（标注修改）
+
+为了在 K 线页面 提供“生成决策工具”功能，需要修改：
+
+文件：pages/kline/kline.js
+修改内容：
+
+导入决策模块
+
+// 新增导入
+import { generateDecisions } from '../../utils/decision'
+
+
+新增生成决策工具函数
+
+generateDecisionTool() {
+  const decisions = generateDecisions(this.data.kline, this.data.user)
+  wx.setStorageSync('decisionTool', decisions)
+  wx.showToast({ title: '决策工具生成成功', icon: 'success' })
+  this.setData({ decisions })
+}
+
+
+UI 调用
+
+可以在 K 线页面增加按钮“生成年度决策工具”，调用 generateDecisionTool()
+
+点击后展示每年的建议与高级建议（会员可见）
+
+五、功能效果
+
+可行到决策工具功能包含：
+
+每年动作列表（可行建议）
+
+高级策略建议（付费会员可见）
+
+综合 K 线 + 系统进化评分 + 社会周期趋势
+
+兼容最终冻结版：
+
+Canvas 绘制、滑动、缩放、点击解释保持不变
+
+进化模块、付费模块与决策模块协同工作
+
+遵守唯一冻结版原则：
+
+不删除原有文件
+
+仅新增 utils/decision/
+
+小范围修改 kline.js
+
+六、最终冻结版目录（增加 decision）
+utils/
+├─ bazi/
+├─ society/
+├─ kline/
+├─ explain/
+├─ evolve/       # 系统进化模块
+├─ payment/      # 付费控制模块
+├─ report/       # 年度报告模块
+└─ decision/     # 可行到决策工具模块
+
+pages/
+├─ index/
+├─ kline/
+└─ fullscreen/
+
+
+✅ 现在最终冻结版 已包含可行到决策工具功能，并：
+
+保留原有功能
+
+遵守唯一冻结版原则
+
+完整融入系统进化 + 付费 + K 线数据
