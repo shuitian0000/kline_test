@@ -4,7 +4,7 @@
     <text>当前年龄：{{currentAge}}</text>
   </view>
 
-  <canvas canvas-id="klineCanvas" class="canvas"></canvas>
+  <canvas canvas-id="klineCanvas" class="canvas" bindtap="onCanvasTap"></canvas>
 
   <button class="btn" bindtap="openFullscreen">全屏查看</button>
 
