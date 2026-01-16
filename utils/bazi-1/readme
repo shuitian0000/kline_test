@@ -29,6 +29,20 @@ utils/
     ├── year_effect.js          # 流年 → 年度变化量（内部）
     └── README.md               # 模块设计说明（冻结）
 
+utils/
+└─ bazi/
+   ├─ index.js
+   ├─ calendar.js
+   ├─ tiangan-dizhi.js
+   ├─ day-pillar.js
+   ├─ wuxing.js
+   ├─ wuxing-weight.js
+   ├─ yongshen.js
+   ├─ structure-score.js
+   ├─ dayun.js
+   └─ liunian.js
+
+
 三、【明确废弃 / 禁止再出现的文件名】
 
 以下文件 不允许 再作为独立模块出现（原因在右侧）：
