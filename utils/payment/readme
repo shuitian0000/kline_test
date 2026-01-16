@@ -1,0 +1,192 @@
+严格遵守 唯一最终冻结版原则 来实现 付费方案模块（Premium / Payment），并将其融入当前小程序中：
+
+不删除原来的文件
+
+只增加文件和必要修改，并明确标注修改内容
+
+功能目标：提供付费功能控制，例如高级进化提示显示、全屏 K 线解锁或更多可视化分析
+
+与系统进化模块兼容
+
+一、新增目录与文件
+utils/
+└─ payment/
+   ├─ index.js       # 统一导出
+   ├─ payment.js     # 核心付费逻辑
+   └─ templates.js   # 付费提示文本
+
+二、新增文件内容
+1️⃣ utils/payment/index.js
+import { checkPremiumAccess, requestPayment } from './payment'
+
+export { checkPremiumAccess, requestPayment }
+
+2️⃣ utils/payment/payment.js
+import { TEMPLATES } from './templates'
+
+/**
+ * 检查用户是否有付费权限访问特定功能
+ * @param {Object} user - 用户对象
+ * @param {string} feature - 功能标识，例如 'evolveDetail'
+ * @returns {boolean}
+ */
+export function checkPremiumAccess(user, feature) {
+  // 简单示例：user.premiumFeatures = ['evolveDetail', 'fullscreen']
+  if (!user || !user.premiumFeatures) return false
+  return user.premiumFeatures.includes(feature)
+}
+
+/**
+ * 请求付费功能
+ * @param {Object} user
+ * @param {string} feature
+ * @returns {Promise<boolean>} 付费成功返回 true
+ */
+export function requestPayment(user, feature) {
+  return new Promise((resolve) => {
+    // 微信支付接口调用示例
+    wx.requestPayment({
+      timeStamp: Date.now().toString(),
+      nonceStr: Math.random().toString(36).substring(2),
+      package: 'prepay_id=xxx',
+      signType: 'MD5',
+      paySign: 'mock_signature',
+      success() {
+        // 标记用户已开通功能
+        if (!user.premiumFeatures) user.premiumFeatures = []
+        user.premiumFeatures.push(feature)
+        resolve(true)
+      },
+      fail() {
+        resolve(false)
+      }
+    })
+  })
+}
+
+/**
+ * 检查并提示付费
+ */
+export function ensureAccess(user, feature) {
+  if (!checkPremiumAccess(user, feature)) {
+    wx.showModal({
+      title: '付费功能',
+      content: TEMPLATES[feature]?.text || '此功能需要开通会员',
+      confirmText: '开通',
+      cancelText: '取消',
+      success: async (res) => {
+        if (res.confirm) {
+          const success = await requestPayment(user, feature)
+          if (success) wx.showToast({ title: '开通成功', icon: 'success' })
+        }
+      }
+    })
+    return false
+  }
+  return true
+}
+
+3️⃣ utils/payment/templates.js
+export const TEMPLATES = {
+  evolveDetail: {
+    text: '高级进化分析需要开通会员才能查看。',
+    advice: '开通会员即可查看详细成长趋势和策略建议。'
+  },
+  fullscreen: {
+    text: '全屏 K 线视图为会员专享功能。',
+    advice: '开通会员即可解锁全屏模式和高级交互。'
+  }
+}
+
+三、原文件修改（标注修改）
+
+为了在 K 线页面和全屏页面 中控制付费功能，需要修改：
+
+文件：pages/kline/kline.js
+修改内容
+
+导入支付模块
+
+// 新增导入
+import { ensureAccess } from '../../utils/payment'
+
+
+在点击查看进化详情前增加权限检查
+
+原有点击事件：
+
+onCanvasTap(e) {
+  const touchX = e.detail.x
+  const index = Math.floor((touchX - 10 - this.data.offsetX) / (barWidth + spacing))
+  if (index >= 0 && index < this.data.kline.length) {
+    this.setData({ selectedPoint: this.data.kline[index] })
+  }
+}
+
+
+修改后：
+
+onCanvasTap(e) {
+  const touchX = e.detail.x
+  const index = Math.floor((touchX - 10 - this.data.offsetX) / (barWidth + spacing))
+  if (index >= 0 && index < this.data.kline.length) {
+    const point = this.data.kline[index]
+
+    // 检查是否付费访问 evolve 详情
+    const hasAccess = ensureAccess(this.data.user, 'evolveDetail')
+    if (hasAccess) {
+      this.setData({ selectedPoint: point })
+    }
+  }
+}
+
+
+全屏页面控制（pages/fullscreen/fullscreen.js）
+
+可选：在全屏切换时检查 fullscreen 会员权限
+
+示例：
+
+onFullScreenToggle() {
+  const hasAccess = ensureAccess(this.data.user, 'fullscreen')
+  if (!hasAccess) return
+  wx.setScreenOrientation({ orientation: 'landscape' })
+}
+
+四、功能效果
+
+用户点击进化详情或全屏页面
+
+如果未开通会员 → 弹出开通提示
+
+如果已开通 → 显示功能
+
+兼容系统进化模块
+
+进化评分、趋势、解释仍然计算
+
+仅限制展示部分高级内容
+
+保持唯一冻结版原则
+
+不删除原有文件
+
+仅新增 utils/payment/
+
+小范围修改 kline.js/fullscreen.js
+
+原有计算、渲染、优化 1~4 保留
+
+五、最终冻结版目录（新增 evolve + payment）
+utils/
+├─ bazi/
+├─ society/
+├─ kline/
+├─ explain/
+├─ evolve/       # 新增系统进化模块
+└─ payment/      # 新增付费控制模块
+
+pages/
+├─ index/
+├─ kline/
+└─ fullscreen/
