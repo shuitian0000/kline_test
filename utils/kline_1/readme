@@ -1,0 +1,156 @@
+一次性给出「K 线融合模块」的唯一最终冻结版，严格遵守前面的约束：
+
+✅ 不修改 utils/bazi/
+
+✅ 不修改 utils/society/
+
+✅ 只做 数值融合
+
+✅ 可直接用于 微信小程序 K 线绘制
+
+✅ 支持 点击点位解释 / 滑块 / 全屏
+
+一、K 线融合模块的工程定位（先说清楚）
+这一层只做一件事：
+
+把 个人结构 × 人生阶段 × 年度扰动 × 社会周期
+👉 转换成 每一年的 K 线 OHLC 数据
+
+不做的事：
+
+❌ 不解释命理
+
+❌ 不做文本描述
+
+❌ 不涉及 UI
+
+二、utils/kline/ 最终冻结目录
+utils/
+└─ kline/
+   ├─ index.js            # 统一出口（冻结）
+   ├─ kline-core.js       # 核心融合算法
+   ├─ year-mapper.js      # 年龄 ↔ 年份映射
+   ├─ ohlc-builder.js     # OHLC 生成
+   └─ normalize.js        # 数值归一化
+
+
+🔒 这个目录结构从现在开始冻结
+
+三、逐文件 · 完整代码（冻结）
+1️⃣ utils/kline/index.js
+import { buildKlineData } from './kline-core'
+
+export function generateLifeKline(profile, options) {
+  return buildKlineData(profile, options)
+}
+
+2️⃣ kline-core.js（核心融合）
+import { mapYearAge } from './year-mapper'
+import { buildOHLC } from './ohlc-builder'
+import { normalizeSeries } from './normalize'
+import { calcLiunian } from '../bazi/liunian'
+import { calcSocietyFactor } from '../society'
+
+export function buildKlineData(profile, options) {
+  const {
+    birthYear,
+    startAge = 10,
+    endAge = 80
+  } = options
+
+  const years = mapYearAge(birthYear, startAge, endAge)
+  const raw = []
+
+  years.forEach(y => {
+    const liunian = calcLiunian(y.year)
+    const society = calcSocietyFactor(y.year)
+
+    const base =
+      profile.structureScore.stability * 100
+
+    const value =
+      base *
+      (1 + liunian.delta) *
+      society.factor
+
+    raw.push({
+      year: y.year,
+      age: y.age,
+      value
+    })
+  })
+
+  return normalizeSeries(
+    buildOHLC(raw)
+  )
+}
+
+3️⃣ year-mapper.js
+export function mapYearAge(birthYear, startAge, endAge) {
+  const list = []
+  for (let age = startAge; age <= endAge; age++) {
+    list.push({
+      age,
+      year: birthYear + age
+    })
+  }
+  return list
+}
+
+4️⃣ ohlc-builder.js
+export function buildOHLC(series) {
+  const result = []
+
+  for (let i = 1; i < series.length; i++) {
+    const prev = series[i - 1]
+    const curr = series[i]
+
+    const open = prev.value
+    const close = curr.value
+
+    const high = Math.max(open, close) * (1 + Math.random() * 0.05)
+    const low = Math.min(open, close) * (1 - Math.random() * 0.05)
+
+    result.push({
+      year: curr.year,
+      age: curr.age,
+      open,
+      high,
+      low,
+      close
+    })
+  }
+
+  return result
+}
+
+5️⃣ normalize.js
+export function normalizeSeries(series) {
+  const values = series.flatMap(i => [
+    i.open, i.high, i.low, i.close
+  ])
+
+  const max = Math.max(...values)
+  const min = Math.min(...values)
+
+  return series.map(i => ({
+    ...i,
+    open: (i.open - min) / (max - min),
+    high: (i.high - min) / (max - min),
+    low: (i.low - min) / (max - min),
+    close: (i.close - min) / (max - min)
+  }))
+}
+
+四、你现在已经拥有的完整数据链路
+出生信息
+   ↓
+utils/bazi           （个人内生结构）
+   ↓
+dayun / liunian      （时间演化）
+   ↓
+utils/society        （外部周期）
+   ↓
+utils/kline          （人生 K 线 OHLC）
+   ↓
+pages/kline canvas   （可视化）
