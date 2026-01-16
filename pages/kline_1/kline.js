@@ -52,21 +52,40 @@ Page({
   },
 
   draw() {
-    const ctx = wx.createCanvasContext('klineCanvas', this)
-    const data = this.data.kline
-    const h = 200
+  const ctx = wx.createCanvasContext('klineCanvas', this)
+  const data = this.data.kline
+  const canvasHeight = 400
+  const canvasWidth = 360
+  const barWidth = 4
+  const spacing = 2
 
-    data.forEach((d, i) => {
-      const x = i * 5 + 10
-      const yOpen = h - d.open * h
-      const yClose = h - d.close * h
+  // 清空画布
+  ctx.clearRect(0, 0, canvasWidth, canvasHeight)
 
-      ctx.beginPath()
-      ctx.moveTo(x, yOpen)
-      ctx.lineTo(x, yClose)
-      ctx.stroke()
-    })
+  // 循环绘制每个 K 线点
+  data.forEach((d, i) => {
+    const x = i * (barWidth + spacing) + 10
+    const openY = canvasHeight - d.open * canvasHeight
+    const closeY = canvasHeight - d.close * canvasHeight
+    const highY = canvasHeight - d.high * canvasHeight
+    const lowY = canvasHeight - d.low * canvasHeight
 
+    // 颜色判断：上涨为红，下跌为绿
+    const color = d.close >= d.open ? '#ff4d4f' : '#4caf50'
+    ctx.setStrokeStyle(color)
+    ctx.setFillStyle(color)
+
+    // 绘制高低线
+    ctx.beginPath()
+    ctx.moveTo(x + barWidth / 2, highY)
+    ctx.lineTo(x + barWidth / 2, lowY)
+    ctx.stroke()
+
+    // 绘制矩形蜡烛实体
+    const rectY = Math.min(openY, closeY)
+    const rectHeight = Math.abs(openY - closeY)
+    ctx.fillRect(x, rectY, barWidth, rectHeight || 1) // 避免高度为0
+  })
     ctx.draw()
   },
 
