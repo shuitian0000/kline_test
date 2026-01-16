@@ -1,0 +1,15 @@
+<view class="container">
+  <view class="slider">
+    <slider min="10" max="80" value="{{currentAge}}" bindchange="onAgeChange"/>
+    <text>当前年龄：{{currentAge}}</text>
+  </view>
+
+  <canvas canvas-id="klineCanvas" class="canvas"></canvas>
+
+  <button class="btn" bindtap="openFullscreen">全屏查看</button>
+
+  <view wx:if="{{selectedPoint}}" class="popup">
+    <text>年龄：{{selectedPoint.age}}</text>
+    <text>趋势值：{{selectedPoint.close}}</text>
+  </view>
+</view>
