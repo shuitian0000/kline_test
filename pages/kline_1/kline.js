@@ -2,6 +2,10 @@ import { buildBaziProfile } from '../../utils/bazi'
 import { generateLifeKline } from '../../utils/kline'
 import { calcSocietyFactor } from '../../utils/society'
 
+// 新增导入,for evolve
+import { evolvePoint, generateEvolutionExplanation } from '../../utils/evolve'
+
+
 Page({
   data: {
     kline: [],
@@ -53,9 +57,15 @@ Page({
         advice = '持续规划，但灵活调整'
       }
 
+    // 新增进化模块,for evolve
+    const evolveResult = evolvePoint(point, { birthYear: profile.birthYear }, { societyScore: society })
+    const evolveExplanation = generateEvolutionExplanation(evolveResult)
+
       return {
         ...point,
-        explanation: { text, risk, advice }
+        explanation: { text, risk, advice },
+        evolve: evolveResult,
+        evolveExplanation
       }
     })
 
