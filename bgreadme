@@ -366,3 +366,180 @@ K 线图可视化增强（颜色/tooltip）	高	优先
 小范围修改明确标注，如 evolve.js 算法、kline.js Canvas 逻辑、fullscreen.js 交互事件
 优先级由 核心功能可用性、用户体验、性能影响 决定
 所有优化都可以单独实现，也可以组合迭代
+
+----------------------------------------
+生成一个 图形化优化路线图（PNG），严格遵守 唯一最终冻结版原则，清晰展示：
+
+每个优化编号与目标
+
+对应模块/文件
+
+优先级
+
+依赖关系
+
+下面我直接给出 Python + graphviz 生成 PNG 的方案，你可以直接运行生成图形化路线图。
+
+Python 生成优化路线图 PNG
+from graphviz import Digraph
+
+# 创建有向图
+dot = Digraph(comment='最终冻结版优化路线图', format='png')
+
+# 定义节点：编号、优化目标、优先级
+nodes = [
+    ('1', 'K线图可视化增强\n(高)', '高'),
+    ('2', '全屏交互优化\n(高)', '高'),
+    ('3', '年度报告/决策工具可视化\n(高)', '高'),
+    ('4', '多维度进化评分融合\n(中高)', '中高'),
+    ('5', '动态趋势模拟\n(中)', '中'),
+    ('6', '本地缓存优化\n(高)', '高'),
+    ('7', '付费功能扩展\n(中)', '中'),
+    ('8', '交互动画\n(中)', '中'),
+    ('9', '主题/皮肤\n(中)', '中'),
+    ('10', '本地备份与导入\n(中)', '中'),
+    ('11', '个性化通知\n(中)', '中'),
+]
+
+# 添加节点
+for nid, label, priority in nodes:
+    color = 'green' if priority == '高' else ('orange' if priority == '中高' else 'lightblue')
+    dot.node(nid, label=label, style='filled', fillcolor=color)
+
+# 添加依赖关系
+# 高优先级阶段
+dot.edge('1', '4')
+dot.edge('2', '5')
+dot.edge('3', '5')
+dot.edge('6', '4')
+# 中期功能增强
+dot.edge('4', '5')
+dot.edge('5', '7')
+# 长期用户体验
+dot.edge('8', '9')
+dot.edge('10', '11')
+
+# 输出 PNG
+dot.render('final_frozen_optimization_map', view=True)
+print("✅ PNG 已生成: final_frozen_optimization_map.png")
+
+说明
+
+节点颜色：
+
+高优先级：绿色
+
+中高优先级：橙色
+
+中优先级：蓝色
+
+依赖关系：
+
+K 线可视化、高屏交互、本地缓存 → 决定多维度评分 & 动态趋势
+
+多维度评分、动态趋势 → 决策工具、付费功能
+
+交互动画、主题/皮肤 → 用户体验优化
+
+本地备份与导入 → 个性化通知
+
+文件生成：
+
+运行后生成 final_frozen_optimization_map.png
+
+可直接用于团队汇报或开发计划
+
+-----------------------------------------
+生成一份 最终冻结版小程序完整开发计划文档，严格遵守 唯一最终冻结版原则，内容包含：
+
+模块与文件结构
+
+优化编号与内容
+
+优先级
+
+依赖关系
+
+实施建议/执行方案
+
+下面是文档内容示例（Markdown格式，方便保存或转成 PDF）：
+
+人生K线图小程序最终冻结版开发计划
+一、项目结构（最终冻结版）
+utils/
+├─ bazi/
+├─ society/
+├─ kline/
+├─ explain/
+├─ evolve/       # 系统进化模块
+├─ payment/      # 付费控制模块
+├─ report/       # 年度报告模块
+└─ decision/     # 可行到决策工具模块
+
+pages/
+├─ index/
+├─ kline/
+└─ fullscreen/
+
+app.js
+app.json
+app.wxss
+project.config.json
+package.json
+
+二、优化路线图
+
+| 编号 | 优化目标         | 模块/文件                                                                     | 优先级 | 依赖    | 实施建议                                                             |
+| -- | ------------ | ------------------------------------------------------------------------- | --- | ----- | ---------------------------------------------------------------- |
+| 1  | K线图可视化增强     | `pages/kline/kline.js`, `pages/fullscreen/fullscreen.js`, `utils/kline`   | 高   | 无     | - 高成长期/波动期/平稳期不同颜色<br>- tooltip显示原解释、进化、社会周期、决策<br>- 缩放时年份标签动态显示 |
+| 2  | 全屏交互优化       | `pages/fullscreen/fullscreen.js`                                          | 高   | 1     | - 横竖屏切换<br>- 惯性滑动、双击放大<br>- Canvas绘制优化                           |
+| 3  | 年度报告/决策工具可视化 | `pages/kline/kline.js`, `utils/report`, `utils/decision`                  | 高   | 1,2   | - 年度报告分页显示<br>- 高/低成长期颜色标记<br>- 决策工具折叠/展开高级建议                    |
+| 4  | 多维度进化评分融合    | `utils/evolve/evolve.js`, `pages/kline/kline.js`                          | 中高  | 1,6   | - 融合用户偏好、历史成绩<br>- 加权生成个性化趋势评分                                   |
+| 5  | 动态趋势模拟       | `utils/kline/kline.js`, `utils/evolve/evolve.js`                          | 中   | 2,3,4 | - 未来5~10年趋势模拟<br>- K线图上显示趋势曲线<br>- 决策工具结合年度优先级                   |
+| 6  | 本地缓存优化       | `pages/kline/kline.js`, `utils/kline/kline.js`                            | 高   | 无     | - 缓存失效机制<br>- 增量缓存K线数据<br>- 减少重复计算                               |
+| 7  | 付费功能扩展       | `utils/payment`, `pages/kline/kline.js`, `pages/fullscreen/fullscreen.js` | 中   | 1,3   | - PDF导出年度报告<br>- 高级预测图表<br>- 自定义策略模板                             |
+| 8  | 交互动画         | `pages/kline/kline.js`, `pages/fullscreen/fullscreen.js`                  | 中   | 1,2   | - K线蜡烛升起动画<br>- 点位点击弹窗渐显/渐隐                                      |
+| 9  | 主题/皮肤        | `app.wxss`, `pages/kline/kline.wxss`                                      | 中   | 无     | - 深色/浅色模式<br>- 多K线颜色主题                                           |
+| 10 | 本地备份与导入      | `utils/report/report.js`, `utils/decision/decision.js`                    | 中   | 6     | - 导出JSON备份用户数据<br>- 导入恢复历史分析                                     |
+| 11 | 个性化通知        | `pages/kline/kline.js`                                                    | 中   | 3,10  | - 提醒用户关注高成长期年份<br>- 可结合年度报告/决策工具                                 |
+
+三、阶段性实施建议
+阶段 1（短期优先实现）
+
+优化 1, 2, 3, 6
+
+目标：核心交互流畅，年度报告/决策工具可视化
+
+阶段 2（中期功能增强）
+
+优化 4, 5, 7
+
+目标：高级评分、多维度预测、付费功能扩展
+
+阶段 3（长期用户体验优化）
+
+优化 8, 9, 10, 11
+
+目标：动画、主题、备份、通知提升用户体验
+
+四、注意事项
+
+唯一最终冻结版原则
+
+不删除现有文件
+
+所有新增功能以新增文件或少量修改实现
+
+修改文件需明确标注（如 kline.js, evolve.js）
+
+功能依赖关系
+
+高优先级优化可作为中期/长期优化的基础
+
+优化之间存在依赖（如 1 → 4 → 5 → 7）
+
+可扩展性
+
+utils 模块均可进一步扩展接口
+
+页面与 Canvas 绘制逻辑可兼容更多预测/趋势显示
