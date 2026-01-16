@@ -1,0 +1,208 @@
+严格遵守 唯一最终冻结版原则 来实现 系统进化模块（Evolution / Evolve），并将其融入当前小程序中：
+
+不删除原来的文件
+
+只增加文件和少量必要修改，并标注修改内容
+
+功能目标：模拟用户个体“进化/成长”，基于八字 + 社会周期 + K 线趋势生成动态能力评分或趋势指数，可作为可选增强功能
+
+一、最终架构设计（融入进化模块）
+utils/
+├─ bazi/         # 八字核心算法（冻结版，不改动）
+├─ society/      # 社会周期算法（冻结版，不改动）
+├─ kline/        # K线融合算法（冻结版，不改动）
+├─ explain/      # 点位解释文本生成（冻结版，不改动）
+└─ evolve/       # 新增，系统进化模块
+     ├─ index.js     # 统一导出
+     ├─ evolve.js    # 核心进化逻辑
+     └─ templates.js # 进化文本 / 提示模板
+
+二、新增文件
+1️⃣ utils/evolve/index.js
+import { evolvePoint, generateEvolutionExplanation } from './evolve'
+
+export { evolvePoint, generateEvolutionExplanation }
+
+2️⃣ utils/evolve/evolve.js
+import { TEMPLATES } from './templates'
+
+/**
+ * 进化算法
+ * @param {Object} point - K线点位 { year, open, close, high, low }
+ * @param {Object} profile - 用户八字结构
+ * @param {Object} options - 扩展参数
+ * @returns {Object} - 进化评分与趋势
+ */
+export function evolvePoint(point, profile, options = {}) {
+  const baseScore = point.close  // 基于 K 线收盘价
+  const ageFactor = (point.year - profile.birthYear) / 100
+  const socialFactor = options.societyScore || 0.5
+
+  // 综合得分 0~1
+  let evolveScore = baseScore * 0.5 + ageFactor * 0.3 + socialFactor * 0.2
+  evolveScore = Math.max(0, Math.min(1, evolveScore))
+
+  // 动态趋势
+  let trend = ''
+  if (evolveScore > 0.7) trend = '高成长期'
+  else if (evolveScore < 0.3) trend = '波动期'
+  else trend = '平稳期'
+
+  return {
+    year: point.year,
+    score: evolveScore,
+    trend
+  }
+}
+
+/**
+ * 生成进化解释文本
+ * @param {Object} evolvePointObj
+ * @returns {Object} explanation
+ */
+export function generateEvolutionExplanation(evolvePointObj) {
+  const { trend } = evolvePointObj
+  const template = TEMPLATES[trend] || TEMPLATES['平稳期']
+
+  return {
+    trend,
+    text: template.text,
+    advice: template.advice
+  }
+}
+
+3️⃣ utils/evolve/templates.js
+export const TEMPLATES = {
+  '高成长期': {
+    text: '此阶段结构和环境支持快速成长，可加大投入学习和实践。',
+    advice: '抓住机会，挑战自我，但注意健康和平衡。'
+  },
+  '波动期': {
+    text: '此阶段不确定因素较多，需谨慎调整策略。',
+    advice: '降低风险，先稳住现有状态，灵活应变。'
+  },
+  '平稳期': {
+    text: '此阶段发展平稳，适合持续优化已有成果。',
+    advice: '维持节奏，积累经验，为未来高成长期做准备。'
+  }
+}
+
+三、原文件修改（标注修改）
+
+为了在 K 线页面 中显示进化结果，需要修改：
+
+文件：pages/kline/kline.js
+修改内容：
+
+导入 evolve 模块
+
+// 新增导入
+import { evolvePoint, generateEvolutionExplanation } from '../../utils/evolve'
+
+
+在生成 K 线数据时增加进化评分
+
+原来代码：
+
+kline = kline.map(point => {
+  const society = calcSocietyFactor(point.year)
+  let text = '', risk = '', advice = ''
+
+  if (point.close > 0.7) {
+    text = '结构偏稳定，适合长期规划'
+    risk = '高期望年份，注意计划过紧'
+    advice = '保持健康生活与持续投入'
+  } else if (point.close < 0.3) {
+    text = '结构波动较大，需灵活应对'
+    risk = '高波动年份，注意财务风险'
+    advice = '减少长期承诺，保守投资'
+  } else {
+    text = '结构均衡，稳中求变'
+    risk = '普通年份，注意保持节奏'
+    advice = '持续规划，但灵活调整'
+  }
+
+  return {
+    ...point,
+    explanation: { text, risk, advice }
+  }
+})
+
+
+修改后，新增 evolvePoint 计算：
+
+kline = kline.map(point => {
+  const society = calcSocietyFactor(point.year)
+
+  // 原有解释
+  let text = '', risk = '', advice = ''
+  if (point.close > 0.7) {
+    text = '结构偏稳定，适合长期规划'
+    risk = '高期望年份，注意计划过紧'
+    advice = '保持健康生活与持续投入'
+  } else if (point.close < 0.3) {
+    text = '结构波动较大，需灵活应对'
+    risk = '高波动年份，注意财务风险'
+    advice = '减少长期承诺，保守投资'
+  } else {
+    text = '结构均衡，稳中求变'
+    risk = '普通年份，注意保持节奏'
+    advice = '持续规划，但灵活调整'
+  }
+
+  // 新增进化模块
+  const evolveResult = evolvePoint(point, { birthYear: profile.birthYear }, { societyScore: society })
+  const evolveExplanation = generateEvolutionExplanation(evolveResult)
+
+  return {
+    ...point,
+    explanation: { text, risk, advice },
+    evolve: evolveResult,
+    evolveExplanation
+  }
+})
+
+
+K 线页面显示修改
+
+在点位点击弹窗，可选择显示 原解释 或 进化解释
+
+页面 UI 适配可加一个小标签 evolveExplanation.text 或 evolveExplanation.advice
+
+四、功能效果
+
+每根 K 线点位除了原本解释外，还会生成：
+
+evolve.score → 0~1 评分
+
+evolve.trend → 高成长期 / 波动期 / 平稳期
+
+evolveExplanation → 文本 + 建议
+
+与原功能兼容：
+
+Canvas 绘制蜡烛
+
+滑动、缩放、点击解释
+
+本地缓存
+
+可作为后续高级功能扩展：
+
+个性化策略提示
+
+成长模拟 / 数据图表
+
+五、总结
+
+✅ 唯一冻结版原则：
+
+不删除原来的文件
+
+新增 utils/evolve/
+
+在 kline.js 中增加 evolve 逻辑
+
+所有原功能保留
+
+进化模块完全可选增强
