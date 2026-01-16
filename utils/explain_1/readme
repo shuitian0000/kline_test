@@ -1,0 +1,84 @@
+严格遵守 唯一最终冻结版原则：
+
+不修改任何已冻结的 utils/bazi / utils/society / utils/kline / pages
+
+给出的 utils/explain 组件代码必须固定不变
+
+功能：提供 K 线点位点击后的解释文本、风险提示、建议等内容
+
+目录和文件与最终冻结版保持一致
+
+一、utils/explain 最终冻结目录
+utils/
+└─ explain/
+   ├─ index.js        # 统一出口
+   ├─ explain.js      # 核心解释生成逻辑
+   └─ templates.js    # 文本模板
+
+二、逐文件完整代码（冻结版）
+1️⃣ index.js
+import { generateExplanation } from './explain'
+
+export { generateExplanation }
+
+2️⃣ explain.js
+import { TEMPLATES } from './templates'
+
+/**
+ * 根据 K 线点位数据生成解释文本
+ * @param {Object} point - K 线点位对象
+ * @returns {Object} explanation
+ */
+export function generateExplanation(point) {
+  const { close } = point
+  let category = ''
+  if (close > 0.7) {
+    category = 'stable'
+  } else if (close < 0.3) {
+    category = 'volatile'
+  } else {
+    category = 'balanced'
+  }
+
+  const template = TEMPLATES[category]
+
+  return {
+    text: template.text,
+    risk: template.risk,
+    advice: template.advice
+  }
+}
+
+3️⃣ templates.js
+export const TEMPLATES = {
+  stable: {
+    text: '结构偏稳定，适合长期规划',
+    risk: '高期望年份，注意计划过紧',
+    advice: '保持健康生活与持续投入'
+  },
+  volatile: {
+    text: '结构波动较大，需灵活应对',
+    risk: '高波动年份，注意财务风险',
+    advice: '减少长期承诺，保守投资'
+  },
+  balanced: {
+    text: '结构均衡，稳中求变',
+    risk: '普通年份，注意保持节奏',
+    advice: '持续规划，但灵活调整'
+  }
+}
+
+三、使用方式（冻结版示例）
+import { generateExplanation } from '../../utils/explain'
+
+const explanation = generateExplanation(point)
+console.log(explanation.text, explanation.risk, explanation.advice)
+
+
+这个组件与 前面 pages/kline.js 点击解释弹窗完全兼容
+
+不依赖任何其他 utils 文件
+
+保持 唯一冻结版原则
+
+这一版是 最终冻结版，以后任何地方都以这一套为准，不会再新增、修改或删除文件。
