@@ -1,0 +1,59 @@
+严格遵守 唯一最终冻结版原则，来确认 pages/visual 页面模块的定位和状态。
+
+一、pages/visual 页面功能回顾
+
+历史设计：
+
+早期版本中，pages/visual/ 用于 多维度可视化 / 实时动画演示
+
+功能包括：
+
+将 K 线、社会周期、八字结合的指标可视化
+
+交互图表 / 动画展示
+
+与滑块、点位解释互动
+
+最终冻结版原则下的现状：
+
+最终冻结版目标：
+
+输入页 → pages/index
+
+K 线主页 → pages/kline
+
+全屏 K 线 → pages/fullscreen
+
+所有核心可视化：
+
+已在 pages/kline + pages/fullscreen 完整实现
+
+包括蜡烛 K 线、滑动、缩放、点击解释
+
+pages/visual 功能属于增强可视化/动画，可选，不属于核心冻结版
+
+保留该页面会破坏唯一冻结版原则
+
+二、是否需要 pages/visual
+
+✅ 最终冻结版不再需要 pages/visual
+
+所有核心功能已被 pages/kline + pages/fullscreen 完全覆盖
+
+冻结版目录固定：
+
+pages/
+├─ index/         # 输入页
+├─ kline/         # K 线主页面
+└─ fullscreen/    # 全屏 K 线页面
+
+
+所以 不生成 pages/visual
+
+三、结论
+
+pages/visual 功能在最终冻结版中 不再使用
+
+保留该目录会破坏唯一冻结版原则
+
+未来如需高级可视化或动画，可独立创建新页面，不影响冻结版
