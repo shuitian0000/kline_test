@@ -1,3 +1,5 @@
+/*canvas + slider + 弹窗*/
+
 <kline-chart
   kline-data="{{kline}}"
   bind:select="onSelect"
