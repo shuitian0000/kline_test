@@ -1,0 +1,120 @@
+严格在「utils/bazi 最终冻结版不再改动」的前提下继续。
+下面进入 下一步：utils/society/（社会周期修正模块）。
+
+⚠️ 说明
+
+不修改、不引用、不侵入 utils/bazi/
+
+社会周期是 外生变量
+
+与八字、流年、人生阶段 只做数值融合
+
+一、utils/society/ 的定位（先讲清楚）
+它解决什么问题？
+
+同样的个人结构
+
+在 不同社会周期 下，人生“K线”的 波动幅度、方向、风险点完全不同
+
+工程原则
+
+不涉及任何命理
+
+不预测个人事件
+
+只做 宏观周期 → 数值扰动
+
+二、最终冻结版：utils/society/ 目录
+utils/
+└─ society/
+   ├─ index.js              # 统一出口（冻结）
+   ├─ constants.js          # 社会周期常量
+   ├─ long-cycle.js         # 长周期（30~60年）
+   ├─ mid-cycle.js          # 中周期（8~12年）
+   ├─ short-cycle.js        # 短周期（1~3年）
+   └─ society-impact.js     # 汇总影响
+
+
+✅ 这个目录 以后也不再改结构
+
+三、逐文件 · 完整代码（冻结）
+1️⃣ utils/society/index.js
+import { calcLongCycle } from './long-cycle'
+import { calcMidCycle } from './mid-cycle'
+import { calcShortCycle } from './short-cycle'
+import { mergeSocietyImpact } from './society-impact'
+
+export function calcSocietyFactor(year) {
+  const longCycle = calcLongCycle(year)
+  const midCycle = calcMidCycle(year)
+  const shortCycle = calcShortCycle(year)
+
+  return mergeSocietyImpact(longCycle, midCycle, shortCycle)
+}
+
+2️⃣ constants.js
+export const SOCIETY_PHASE = {
+  EXPANSION: 'expansion',
+  PEAK: 'peak',
+  CONTRACTION: 'contraction',
+  RECOVERY: 'recovery'
+}
+
+3️⃣ long-cycle.js（类似康波，但不明说）
+import { SOCIETY_PHASE } from './constants'
+
+export function calcLongCycle(year) {
+  const cycleLength = 60
+  const pos = (year - 1900) % cycleLength
+
+  if (pos < 15) return { phase: SOCIETY_PHASE.RECOVERY, factor: 0.9 }
+  if (pos < 30) return { phase: SOCIETY_PHASE.EXPANSION, factor: 1.1 }
+  if (pos < 45) return { phase: SOCIETY_PHASE.PEAK, factor: 1.0 }
+  return { phase: SOCIETY_PHASE.CONTRACTION, factor: 0.8 }
+}
+
+4️⃣ mid-cycle.js
+import { SOCIETY_PHASE } from './constants'
+
+export function calcMidCycle(year) {
+  const cycleLength = 10
+  const pos = year % cycleLength
+
+  if (pos < 3) return { phase: SOCIETY_PHASE.RECOVERY, factor: 0.95 }
+  if (pos < 6) return { phase: SOCIETY_PHASE.EXPANSION, factor: 1.05 }
+  if (pos < 8) return { phase: SOCIETY_PHASE.PEAK, factor: 1.0 }
+  return { phase: SOCIETY_PHASE.CONTRACTION, factor: 0.9 }
+}
+
+5️⃣ short-cycle.js
+export function calcShortCycle(year) {
+  const noise = Math.sin(year * 0.37)
+  return {
+    factor: 1 + noise * 0.05
+  }
+}
+
+6️⃣ society-impact.js
+export function mergeSocietyImpact(longC, midC, shortC) {
+  const factor =
+    longC.factor * 0.5 +
+    midC.factor * 0.3 +
+    shortC.factor * 0.2
+
+  return {
+    factor,
+    detail: {
+      long: longC,
+      mid: midC,
+      short: shortC
+    }
+  }
+}
+
+四、到这里为止，系统已经具备什么能力？
+
+✅ 个人内生结构（utils/bazi）
+✅ 时间演化（dayun / liunian）
+✅ 外部宏观环境（utils/society）
+
+接下来只剩 一件核心事情：
