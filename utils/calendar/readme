@@ -1,0 +1,58 @@
+严格遵守 唯一最终冻结版原则，来确认 utils/calendar 的定位和状态。
+
+一、utils/calendar 组件功能回顾
+
+历史设计：
+
+早期版本中，utils/calendar/ 用于 日期与干支历法转换
+
+功能包括：
+
+公历 ↔ 农历转换
+
+八字计算所需的年柱、月柱、日柱
+
+节气、流年、运势等辅助计算
+
+曾被部分八字算法依赖
+
+最终冻结版原则下的现状：
+
+所有 核心八字计算逻辑 已封装在 utils/bazi
+
+小程序的 K 线计算和解释，不再直接使用独立 calendar 模块
+
+utils/bazi 内部可包含必要的日期转换逻辑，不需要单独暴露 calendar
+
+保留这个目录会 破坏冻结版唯一性
+
+二、是否需要 utils/calendar
+
+✅ 最终冻结版不再需要 utils/calendar
+
+核心八字 + 流年计算 → 已在 utils/bazi 完整实现
+
+文本解释 → utils/explain
+
+数值融合 → utils/kline
+
+其他支持 → utils/society
+
+最终冻结版目录固定：
+
+utils/
+├─ bazi/       # 八字核心算法
+├─ society/    # 社会周期算法
+├─ kline/      # 人生K线融合算法
+└─ explain/    # 点位解释文本生成
+
+
+所以 不生成 utils/calendar
+
+三、结论
+
+utils/calendar 功能已由 utils/bazi 内部整合
+
+保留 calendar 会破坏唯一冻结版原则
+
+未来如需扩展可独立实现，不影响冻结版
