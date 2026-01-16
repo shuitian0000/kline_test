@@ -8,6 +8,9 @@ import { evolvePoint, generateEvolutionExplanation } from '../../utils/evolve'
 import { ensureAccess } from '../../utils/payment'
 // 新增导入,for report
 import { generateAnnualReport } from '../../utils/report'
+// 新增导入,for decision
+import { generateDecisions } from '../../utils/decision'
+
 
 Page({
   data: {
@@ -16,12 +19,21 @@ Page({
     selectedPoint: null
   },
 
+  //for report
   generateReport() {
   const report = generateAnnualReport(this.data.kline, this.data.user)
   wx.setStorageSync('annualReport', report)
   wx.showToast({ title: '年度报告生成成功', icon: 'success' })
   this.setData({ report })
 },
+  //for decision
+  generateDecisionTool() {
+  const decisions = generateDecisions(this.data.kline, this.data.user)
+  wx.setStorageSync('decisionTool', decisions)
+  wx.showToast({ title: '决策工具生成成功', icon: 'success' })
+  this.setData({ decisions })
+},
+
 
 
   onLoad(query) {
