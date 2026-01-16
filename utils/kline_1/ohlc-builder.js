@@ -17,7 +17,12 @@ export function buildOHLC(series) {
       open,
       high,
       low,
-      close
+      close，
+      explanation: {
+        text: '结构稳定，适合长期规划',
+        risk: '波动年份注意财务支出',
+        advice: '保持健康生活与学习规划'
+        }
     })
   }
 
