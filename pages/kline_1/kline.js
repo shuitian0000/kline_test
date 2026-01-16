@@ -4,6 +4,9 @@ import { calcSocietyFactor } from '../../utils/society'
 
 // 新增导入,for evolve
 import { evolvePoint, generateEvolutionExplanation } from '../../utils/evolve'
+// 新增导入,for payment
+import { ensureAccess } from '../../utils/payment'
+
 
 
 Page({
@@ -118,16 +121,31 @@ Page({
     ctx.draw()
   },
 
-  onCanvasTap(e) {
-    const x = e.detail.x    
-    const barWidth = 4
-    const spacing = 2
-    const index = Math.floor((x - 10) / 5)
-    if (index >= 0 && index < this.data.kline.length) {
-      const point = this.data.kline[index]
+  // onCanvasTap(e) {
+  //   const x = e.detail.x    
+  //   const barWidth = 4
+  //   const spacing = 2
+  //   const index = Math.floor((x - 10) / 5)
+  //   if (index >= 0 && index < this.data.kline.length) {
+  //     const point = this.data.kline[index]
+  //     this.setData({ selectedPoint: point })
+  //   }
+  // },
+//for payment
+onCanvasTap(e) {
+  const touchX = e.detail.x
+  const index = Math.floor((touchX - 10 - this.data.offsetX) / (barWidth + spacing))
+  if (index >= 0 && index < this.data.kline.length) {
+    const point = this.data.kline[index]
+
+    // 检查是否付费访问 evolve 详情
+    const hasAccess = ensureAccess(this.data.user, 'evolveDetail')
+    if (hasAccess) {
       this.setData({ selectedPoint: point })
     }
-  },
+  }
+},
+
 
   onAgeChange(e) {
     this.setData({ currentAge: e.detail.value })
